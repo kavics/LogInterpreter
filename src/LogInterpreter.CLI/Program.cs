@@ -1,10 +1,23 @@
-﻿using LogInterpreter.CLI;
+﻿using System;
+using LogInterpreter.CLI;
 
-//TestsForDev.TwoLineReaderTest();
-//TestsForDev.TwoLineParserTest();
-//TestsForDev.Pipeline1();
-//TestsForDev.TwoLineParser();
-//TestsForDev.TwoLineParserIoT();
-//TestsForDev.TwoLineParser_Manfred_Experimental();
-//TestsForDev.TwoLineParser_Manfred_RentalAndIoT();
-TestsForDev.CompactJsonParser_Manfred_RentalAndIoT();
+namespace LogInterpreter.CLI
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+                var appArgs = ArgumentParser.Parse(args);
+                Console.WriteLine($"Command: {appArgs.Command}");
+                // Further processing based on the command
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine("Usage: LogInterpreter.CLI <command> [parameters]");
+            }
+        }
+    }
+}
