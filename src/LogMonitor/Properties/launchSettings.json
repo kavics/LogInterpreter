@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "LogMonitor": {
+      "commandName": "Project",
+      //"commandLineArgs": "https://localhost:35322"
+      "commandLineArgs": "https://manfredrepo-test.sensenet.cloud"
+    }
+  }
+}
