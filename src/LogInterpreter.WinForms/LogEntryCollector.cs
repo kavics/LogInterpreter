@@ -8,6 +8,8 @@ namespace LogInterpreter.WinForms;
 /// </summary>
 internal class LogEntryCollector : IPipelineItem<LogEntry, LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     public List<ILogEntry> CollectedEntries { get; } = new List<ILogEntry>();
     
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();

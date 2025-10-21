@@ -6,6 +6,8 @@ namespace LogInterpreter.Abstractions.DefaultImplementations;
 
 public class CompactJsonLogParser : IPipelineItem<string, LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<LogEntry> GetEnumerator()

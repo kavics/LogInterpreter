@@ -2,6 +2,8 @@
 
 public class Filter<T>(Func<T, bool> filter) : IPipelineItem<T, T> //where T : ILogEntry
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<T> Input { get; set; } = Array.Empty<T>();
 
     public IEnumerator<T> GetEnumerator()

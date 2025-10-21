@@ -4,6 +4,7 @@ namespace LogInterpreter.Abstractions;
 
 public interface IPipelineItem
 {
+    string Name { get; }
 }
 
 public interface IPipelineItem<TIn, out TOut> : IEnumerable<TOut>, IPipelineItem

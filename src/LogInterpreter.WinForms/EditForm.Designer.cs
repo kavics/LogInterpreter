@@ -56,7 +56,7 @@ namespace LogInterpreter.WinForms
             splitContainer.Panel2.Controls.Add(rightPanel);
             splitContainer.Panel2MinSize = 300;
             splitContainer.Size = new Size(990, 600);
-            splitContainer.SplitterDistance = 343;
+            splitContainer.SplitterDistance = 449;
             splitContainer.TabIndex = 0;
             // 
             // leftPanel
@@ -66,8 +66,7 @@ namespace LogInterpreter.WinForms
             leftPanel.Dock = DockStyle.Fill;
             leftPanel.Location = new Point(0, 0);
             leftPanel.Name = "leftPanel";
-            leftPanel.Padding = new Padding(10);
-            leftPanel.Size = new Size(343, 600);
+            leftPanel.Size = new Size(449, 600);
             leftPanel.TabIndex = 0;
             // 
             // pipelineListBox
@@ -75,10 +74,9 @@ namespace LogInterpreter.WinForms
             pipelineListBox.Dock = DockStyle.Fill;
             pipelineListBox.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 238);
             pipelineListBox.FormattingEnabled = true;
-            pipelineListBox.Items.AddRange(new object[] { "Item 1", "Item 2" });
-            pipelineListBox.Location = new Point(10, 30);
+            pipelineListBox.Location = new Point(0, 20);
             pipelineListBox.Name = "pipelineListBox";
-            pipelineListBox.Size = new Size(323, 560);
+            pipelineListBox.Size = new Size(449, 580);
             pipelineListBox.TabIndex = 1;
             // 
             // pipelineLabel
@@ -86,7 +84,7 @@ namespace LogInterpreter.WinForms
             pipelineLabel.AutoSize = true;
             pipelineLabel.Dock = DockStyle.Top;
             pipelineLabel.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 238);
-            pipelineLabel.Location = new Point(10, 10);
+            pipelineLabel.Location = new Point(0, 0);
             pipelineLabel.Name = "pipelineLabel";
             pipelineLabel.Size = new Size(64, 20);
             pipelineLabel.TabIndex = 0;
@@ -98,7 +96,7 @@ namespace LogInterpreter.WinForms
             rightPanel.Location = new Point(0, 0);
             rightPanel.Name = "rightPanel";
             rightPanel.Padding = new Padding(10);
-            rightPanel.Size = new Size(643, 600);
+            rightPanel.Size = new Size(537, 600);
             rightPanel.TabIndex = 0;
             // 
             // EditForm

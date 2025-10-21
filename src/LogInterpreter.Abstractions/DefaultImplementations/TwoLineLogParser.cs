@@ -4,6 +4,8 @@ namespace LogInterpreter.Abstractions.DefaultImplementations;
 
 public class TwoLineLogParser : IPipelineItem<string[], LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     private LogEntry _notRecognized = new LogEntry { Message = "not recognized entry" };
     private LogEntry _notRecognizedDate = new LogEntry { Message = "not recognized date" };
 

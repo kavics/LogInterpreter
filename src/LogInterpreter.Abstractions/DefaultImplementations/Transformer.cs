@@ -2,6 +2,8 @@
 {
     public class Transformer<Tin, Tout>(Func<Tin, Tout> transformer) : IPipelineItem<Tin, Tout>
     {
+        public string Name => this.GetType().Name;
+
         public IEnumerable<Tin> Input { get; set; } = Array.Empty<Tin>();
         public IEnumerator<Tout> GetEnumerator()
         {

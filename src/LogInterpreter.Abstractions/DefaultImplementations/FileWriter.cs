@@ -4,6 +4,8 @@ namespace LogInterpreter.Abstractions.DefaultImplementations
 {
     public class FileWriter(string path) : IPipelineItem<string, string>
     {
+        public string Name => this.GetType().Name;
+
         public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
         public IEnumerator<string> GetEnumerator()

@@ -8,6 +8,8 @@ namespace LogInterpreter.WinForms;
 /// </summary>
 internal class Counter : IPipelineItem<LogEntry, LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     public int Entries { get; private set; }
     public int NotParsedEntries { get; private set; }
     public int Informations { get; private set; }
@@ -53,6 +55,8 @@ internal class Counter : IPipelineItem<LogEntry, LogEntry>
 /// </summary>
 internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
     public Dictionary<string, List<DateTime>> Criticals { get; } = new();
