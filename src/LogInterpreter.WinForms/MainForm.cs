@@ -10,6 +10,9 @@ namespace LogInterpreter.WinForms
         private BindingList<ILogEntry> logEntries;
         private string? currentLogFilePath;
         private Pipeline? currentPipeline;
+        private Counter? pipelineCounter;
+        private ErrorAggregator? pipelineErrorAggregator;
+        private LogEntryCollector? pipelineCollector;
 
         public MainForm()
         {
@@ -17,7 +20,42 @@ namespace LogInterpreter.WinForms
             SetupDataGridView();
             SetupToolbarIcons();
             SetWindowTitle();
+            SetupPipeline();
             UpdateStatusBar("Kész");
+        }
+
+        private void SetupPipeline()
+        {
+            // Pipeline elemek létrehozása
+            pipelineCounter = new Counter();
+            pipelineErrorAggregator = new ErrorAggregator();
+            pipelineCollector = new LogEntryCollector();
+
+            // Pipeline összeállítása (LogSource nélkül egyelõre)
+            currentPipeline = new Pipeline();
+            // Pipeline újraépítése az új log fájllal
+            pipelineCounter = new Counter();
+            pipelineErrorAggregator = new ErrorAggregator();
+            pipelineCollector = new LogEntryCollector();
+
+            currentPipeline = new Pipeline()
+                .AddItem(new LogSource(string.Empty))
+                .AddItem(new OneLineLogFileReader())
+                .AddItem(new CompactJsonLogParser())
+                .AddItem(pipelineCounter)
+                .AddItem(pipelineErrorAggregator)
+                .AddItem(new Filter<LogEntry>(e =>
+                {
+                    return true;
+                    if (e.Message.StartsWith("Updating rental status"))
+                        return true;
+                    if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
+                        return true;
+                    if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
+                        return true;
+                    return false;
+                }))
+                .AddItem(pipelineCollector);
         }
 
         private void SetupDataGridView()
@@ -48,51 +86,55 @@ namespace LogInterpreter.WinForms
                 ShowProgress(true);
                 UpdateStatusBar("Log fájl feldolgozása...");
                 
-                // Pipeline elemek létrehozása
-                var counter = new Counter();
-                var errorAggregator = new ErrorAggregator();
-                var collector = new LogEntryCollector();
-
-                // Pipeline összeállítása
-                var pipeline = new Pipeline()
-                    .AddItem(new LogSource(logFilePath))
-                    .AddItem(new OneLineLogFileReader())
-                    .AddItem(new CompactJsonLogParser())
-                    .AddItem(counter)
-                    .AddItem(errorAggregator)
-                    .AddItem(new Filter<LogEntry>(e =>
-                    {
-                        return true;
-                        if (e.Message.StartsWith("Updating rental status"))
-                            return true;
-                        if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
-                            return true;
-                        if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
-                            return true;
-                        return false;
-                    }))
-                    .AddItem(collector);
+                currentLogFilePath = logFilePath;
+//currentPipeline.??? = logFilePath;
 
                 // Pipeline futtatása
-                pipeline.Run();
+                RunPipeline();
+            }
+            catch (Exception ex)
+            {
+                ShowProgress(false);
+                MessageBox.Show(
+                    $"Hiba a log fájl feldolgozása közben:\n{ex.Message}",
+                    "Hiba",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                UpdateStatusBar("Hiba történt");
+            }
+        }
 
-                // Pipeline mentése késõbbi felhasználásra
-                currentPipeline = pipeline;
+        /// <summary>
+        /// A pipeline futtatása és az eredmények betöltése
+        /// </summary>
+        private void RunPipeline()
+        {
+            if (currentPipeline == null || pipelineCollector == null || pipelineCounter == null)
+            {
+                ShowProgress(false);
+                return;
+            }
+
+            try
+            {
+                // Collector kiürítése az újrafuttatás elõtt
+                pipelineCollector.CollectedEntries.Clear();
+
+                // Pipeline futtatása
+                currentPipeline.Run();
 
                 // Eredmények betöltése a DataGridView-ba
                 logEntries.Clear();
-                foreach (var entry in collector.CollectedEntries)
+                foreach (var entry in pipelineCollector.CollectedEntries)
                 {
                     logEntries.Add(entry);
                 }
-
-                currentLogFilePath = logFilePath;
                 
                 // Státusz frissítése a statisztikákkal
                 UpdateStatusBar($"Betöltve: {logEntries.Count} bejegyzés, " +
-                              $"Összes: {counter.Entries}, " +
-                              $"Hibák: {counter.Errors}, " +
-                              $"Figyelmeztetések: {counter.Warnings}");
+                              $"Összes: {pipelineCounter.Entries}, " +
+                              $"Hibák: {pipelineCounter.Errors}, " +
+                              $"Figyelmeztetések: {pipelineCounter.Warnings}");
                 
                 ShowProgress(false);
             }
@@ -100,7 +142,7 @@ namespace LogInterpreter.WinForms
             {
                 ShowProgress(false);
                 MessageBox.Show(
-                    $"Hiba a log fájl feldolgozása közben:\n{ex.Message}",
+                    $"Hiba a pipeline futtatása közben:\n{ex.Message}",
                     "Hiba",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
@@ -500,17 +542,43 @@ namespace LogInterpreter.WinForms
 
         private void RefreshToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(currentLogFilePath) && File.Exists(currentLogFilePath))
-            {
-                LoadFromPipeline(currentLogFilePath);
-            }
-            else
+            if (currentPipeline == null || string.IsNullOrEmpty(currentLogFilePath))
             {
                 MessageBox.Show(
                     "Nincs betöltött log fájl, amit frissíteni lehetne.",
                     "Frissítés",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
+                return;
+            }
+
+            if (!File.Exists(currentLogFilePath))
+            {
+                MessageBox.Show(
+                    $"A log fájl már nem létezik:\n{currentLogFilePath}",
+                    "Frissítés",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                ShowProgress(true);
+                UpdateStatusBar("Frissítés...");
+                
+                // Pipeline újrafuttatása
+                RunPipeline();
+            }
+            catch (Exception ex)
+            {
+                ShowProgress(false);
+                MessageBox.Show(
+                    $"Hiba a frissítés közben:\n{ex.Message}",
+                    "Hiba",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                UpdateStatusBar("Frissítés sikertelen");
             }
         }
 

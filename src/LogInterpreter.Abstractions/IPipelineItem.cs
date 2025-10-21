@@ -2,7 +2,11 @@
 
 namespace LogInterpreter.Abstractions;
 
-public interface IPipelineItem<TIn, out TOut> : IEnumerable<TOut>
+public interface IPipelineItem
+{
+}
+
+public interface IPipelineItem<TIn, out TOut> : IEnumerable<TOut>, IPipelineItem
 {
     IEnumerable<TIn> Input { get; set; }
     IEnumerator IEnumerable.GetEnumerator()

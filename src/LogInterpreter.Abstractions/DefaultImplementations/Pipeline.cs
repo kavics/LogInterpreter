@@ -5,12 +5,14 @@ namespace LogInterpreter.Abstractions.DefaultImplementations
     public class Pipeline
     {
         protected IEnumerable? _endpoint;
+        public List<IPipelineItem> Items { get; } = new();
 
         public Pipeline AddItem<TIn, TOut>(IPipelineItem<TIn, TOut> item)
         {
             if (_endpoint == null)
             {
                 _endpoint = item;
+                Items.Add(item);
                 return this;
             }
 
@@ -18,6 +20,7 @@ namespace LogInterpreter.Abstractions.DefaultImplementations
             {
                 item.Input = (IEnumerable<TIn>)inputItem;
                 _endpoint = item;
+                Items.Add(item);
                 return this;
             }
 

@@ -8,23 +8,32 @@
 /// <param name="firstFileName">Optional. Skips files before the given name.
 ///   The order depends on the operating system.
 ///   Only makes sense if <paramref name="path"/> points to a directory.</param>
-public class LogSource(string path, string? firstFileName = null) : IPipelineItem<int, string>
+public class LogSource : IPipelineItem<int, string>
 {
     public IEnumerable<int> Input { get; set; } = Array.Empty<int>();
+
+    public string LogPath { get; set; }
+    public string? FirstFileName { get; set; }
+    public LogSource(string path, string? firstFileName = null)
+    {
+        LogPath = path;
+        FirstFileName = firstFileName;
+    }
+
     public IEnumerator<string> GetEnumerator()
     {
-        if(Directory.Exists(path))
+        if(Directory.Exists(LogPath))
         {
-            if (firstFileName == null)
+            if (FirstFileName == null)
             {
-                foreach (var file in Directory.GetFiles(path))
+                foreach (var file in Directory.GetFiles(LogPath))
                     yield return file;
             }
             else
             {
-                var trigger = firstFileName.ToLowerInvariant();
+                var trigger = FirstFileName.ToLowerInvariant();
                 var triggerAchieved = false;
-                foreach (var file in Directory.GetFiles(path))
+                foreach (var file in Directory.GetFiles(LogPath))
                 {
                     if (!triggerAchieved && Path.GetFileName(file).ToLowerInvariant() == trigger)
                     {
@@ -36,13 +45,13 @@ public class LogSource(string path, string? firstFileName = null) : IPipelineIte
                 }
             }
         }
-        else if(File.Exists(path))
+        else if(File.Exists(LogPath))
         {
-            yield return path;
+            yield return LogPath;
         }
         else
         {
-            throw new FileNotFoundException($"The specified path '{path}' does not exist or is not a directory/file.");
+            throw new FileNotFoundException($"The specified path '{LogPath}' does not exist or is not a directory/file.");
         }
     }
 }
