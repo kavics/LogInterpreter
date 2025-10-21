@@ -480,6 +480,8 @@ internal static class TemplateParser
 
 internal class Counter : IPipelineItem<LogEntry, LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     public int Entries { get; private set; }
     public int NotParsedEntries { get; private set; }
     public int Informations { get; private set; }
@@ -517,6 +519,8 @@ internal class Counter : IPipelineItem<LogEntry, LogEntry>
 
 internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
     public Dictionary<string, List<DateTime>> Criticals = new();
@@ -604,6 +608,8 @@ internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
 
 internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     Dictionary<string, string> _started = new ();
@@ -644,8 +650,19 @@ internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
     }
 }
 
-internal class FirstLineReader(int? count = null) : IPipelineItem<string, string>
+internal class FirstLineReader : IPipelineItem<string, string>
 {
+    [Configurable]
+    public int? Count { get; set; }
+
+    public FirstLineReader(int? count = null)
+    {
+        Count = count;
+    }
+
+    public string Name => this.GetType().Name;
+
+
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<string> GetEnumerator()
@@ -653,7 +670,7 @@ internal class FirstLineReader(int? count = null) : IPipelineItem<string, string
         foreach (var path in Input)
         {
             using var textReader = new StreamReader(path);
-            for (int i = 0; i < (count ?? 1); i++)
+            for (int i = 0; i < (Count ?? 1); i++)
             {
                 var line = textReader.ReadLine();
                 if (line != null)

@@ -14,7 +14,9 @@ public class LogSource : IPipelineItem<int, string>
 
     public IEnumerable<int> Input { get; set; } = Array.Empty<int>();
 
+    [Configurable(ConfigurationType.Path)]
     public string LogPath { get; set; }
+    [Configurable(ConfigurationType.Path)]
     public string? FirstFileName { get; set; }
     public LogSource(string path, string? firstFileName = null)
     {

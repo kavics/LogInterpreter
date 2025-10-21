@@ -6,6 +6,8 @@ namespace LogInterpreter.Tests;
 
 internal class TestLogSource : IPipelineItem<string, string>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<string> Input { get; set; }
     public IEnumerator<string> GetEnumerator() => Input.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -13,6 +15,8 @@ internal class TestLogSource : IPipelineItem<string, string>
 
 internal class TestAggregator<T> : IPipelineItem<T, T>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<T> Input { get; set; }
     public List<T> Output { get; set; } = new List<T>();
 

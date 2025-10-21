@@ -2,15 +2,23 @@
 
 namespace LogInterpreter.Abstractions.DefaultImplementations
 {
-    public class FileWriter(string path) : IPipelineItem<string, string>
+    public class FileWriter : IPipelineItem<string, string>
     {
+        [Configurable(ConfigurationType.Path)]
+        public string FilePath { get; set; }
+
+        public FileWriter(string path)
+        {
+            FilePath = path;
+        }
+
         public string Name => this.GetType().Name;
 
         public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
         public IEnumerator<string> GetEnumerator()
         {
-            using var fileStream = new System.IO.FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
+            using var fileStream = new System.IO.FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write);
             using var writer = new StreamWriter(fileStream, Encoding.UTF8);
             foreach (var line in Input)
             {
