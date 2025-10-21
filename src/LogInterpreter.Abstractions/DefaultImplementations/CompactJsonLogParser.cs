@@ -1,5 +1,6 @@
 ﻿
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace LogInterpreter.Abstractions.DefaultImplementations;
 
@@ -26,7 +27,7 @@ public class CompactJsonLogParser : IPipelineItem<string, LogEntry>
             var entry = new LogEntry
             {
                 Raw = [line],
-                Time = DateTime.Parse(json["@t"]?.ToString() ?? DateTime.MinValue.ToString()),
+                Time = json["@t"]?.Value<DateTime?>() ?? DateTime.MinValue,
                 Message = json["@mt"]?.ToString() ?? "",
                 Level = ParseLogLevel(json["@l"]?.ToString())
             };

@@ -6,7 +6,7 @@
       //"commandLineArgs": "command1 --arg21 456 --arg22 cmd2arg2"
       //"commandLineArgs": "command2 --arg21 456 --arg22 cmd2arg2"
       //"commandLineArgs": "command2 --arg21 cmd2arg2 --arg22 456",
-      "commandLineArgs": "rewrite path1 path2"
+      "commandLineArgs": "Rewrite \"D:\\__temp\\logs\\manfredrepo-staging\\log-20250701_142118.txt\" \"D:\\__temp\\logs\\manfredrepo-staging\\log-20250701_142118-readable.txt\""
     }
   }
 }

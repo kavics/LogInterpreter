@@ -350,6 +350,75 @@ internal static class TestsForDev
         Console.WriteLine($"===========================================================");
         Console.WriteLine("Ok");
     }
+
+    internal static void CompactJsonParser_Manfred_Prod_FilesAndDates()
+    {
+        new Pipeline()
+            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod"))
+            //.AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod", "log-20250625_124309.txt"))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new FirstLineReader())
+            .AddItem(new Transformer<string, string>(line => $"    {(line.Length > 60 ? line.Substring(0, 60) : line)}"))
+            .AddItem(new ConsoleWriter())
+            .Run();
+    }
+
+    internal static void CompactJsonParser_Manfred_LiveTest2027_07_12()
+    {
+        var counter = new Counter();
+        var errorAggregator = new ErrorAggregator();
+        var collector = new ManfredUnfinishedRentalCollector();
+        var pattern2 = @"Rental (\d+) initiated for user (\S+)";
+
+        new Pipeline()
+            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod\log-20250710_145840.txt"))
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(counter)
+            .AddItem(errorAggregator)
+            .AddItem(new Filter<LogEntry>(e =>
+            {
+                if (e.Message.StartsWith("Updating rental status"))
+                    return true;
+                if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
+                    return true;
+                if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
+                    return true;
+                return false;
+            }))
+            .AddItem(new Formatter<LogEntry>(entry =>
+            {
+                if (!entry.Properties.TryGetValue("UserEmail", out var user))
+                    user = "unknown";
+                if (!entry.Properties.TryGetValue("RentalId", out var rental))
+                    rental = "";
+
+                var message = entry.Message
+                    .Replace("Rental {RentalId} started for user {UserEmail}", "Rental start")
+                    .Replace("Updating rental status: ", "")
+                    .Replace("Updating rental status after wait for close: ", "");
+                return $"{entry.Time.ToUniversalTime():yyyy-MM-dd HH:mm:ss.fff} #{rental} @{user,-32} {message}";
+            }))
+            .AddItem(new ConsoleWriter())
+            .Run();
+
+        Console.WriteLine("===========================================================");
+        Console.WriteLine($"Entries:           {counter.Entries,8}");
+        Console.WriteLine($"NotParsed:         {counter.NotParsedEntries,8}");
+        Console.WriteLine("LEVELS");
+        Console.WriteLine($"  Informations:    {counter.Informations,8}");
+        Console.WriteLine($"  Warnings:        {counter.Warnings,8}");
+        Console.WriteLine($"  Errors:          {counter.Errors,8}");
+        Console.WriteLine("CATEGORIES");
+        foreach (var category in counter.Categories)
+            Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
+
+        Console.Write("Writing error-aggregation file... ");
+        errorAggregator.WriteToFile(@"D:\__temp\logs\analízis\Manfred_LiveTest2027_07_12-ERRORS.txt");
+        Console.WriteLine("Ok");
+
+    }
+
 }
 
 /// <summary>
@@ -572,5 +641,24 @@ internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
     {
         foreach (var kvp in _started.Where(kvp => !_finished.Contains(kvp.Key)))
             yield return kvp;
+    }
+}
+
+internal class FirstLineReader(int? count = null) : IPipelineItem<string, string>
+{
+    public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
+
+    public IEnumerator<string> GetEnumerator()
+    {
+        foreach (var path in Input)
+        {
+            using var textReader = new StreamReader(path);
+            for (int i = 0; i < (count ?? 1); i++)
+            {
+                var line = textReader.ReadLine();
+                if (line != null)
+                    yield return line;
+            }
+        }
     }
 }
