@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 
 string baseUrl = args.Length > 0 ? args[0].TrimEnd('/') : throw new ArgumentException("URL argument required.");
-//string apiKey = "99L3lxaLUdTAM6SPIExeVB6e5t2eqUqoniBiQyaY0tFNWKnCXLqoFDbmXluELMV6qnYfVF7e1hxMIRmjwVN"; // localhost
-string apiKey = "VuNsv1DSxZ5VUgw9vlh6yAgAf94SaMJXh2Bv91NAeal6EKEyZPoZX5x34lBYHWeN80lnUjX7t9AeibgRmiu"; // manfredrepo-test
+string apiKey = "hTzgPCY4V0UsPDkL3rdDQMse7DVOj8oPER58Smt2eLwJzfIW7Mesmr8ZWKin8Kl63Otu5NAZddLyyaPxaPc"; // localhost
+//string apiKey = "7A6Qshz4UwLvFXvBLP2TLyJNUnJT6vetjPjAiDijJy2XFZlE3613MTMGpLEsgbCmG1w0fh6Oe3MKJ6vM0ah"; // manfredrepo-test
 HttpClient client = new();
 client.DefaultRequestHeaders.Add("apiKey", apiKey);
 
@@ -69,8 +69,8 @@ async Task PollRecent()
         {
             if (logEvent.Message.StartsWith("HTTP \"GET\" \"/log/recent\""))
                 continue;
-            if (!logEvent.Message.StartsWith("[IoT ") && !logEvent.Message.StartsWith("Updating rental status"))
-                continue;
+            //if (!logEvent.Message.StartsWith("[IoT ") && !logEvent.Message.StartsWith("Updating rental status"))
+            //    continue;
             Console.WriteLine($"{logEvent.Timestamp:yyyy-MM-dd HH:mm:ss}\t{logEvent.Message}");
         }
     }
