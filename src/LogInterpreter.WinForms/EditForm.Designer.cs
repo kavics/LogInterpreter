@@ -33,6 +33,7 @@ namespace LogInterpreter.WinForms
             pipelineListBox = new ListBox();
             pipelineLabel = new Label();
             rightPanel = new Panel();
+            configurationPanel = new Panel();
             configurationLabel = new Label();
             propertiesPanel = new Panel();
             outputTypeTextBox = new TextBox();
@@ -68,6 +69,7 @@ namespace LogInterpreter.WinForms
             splitContainer.Panel2MinSize = 300;
             splitContainer.Size = new Size(990, 600);
             splitContainer.SplitterDistance = 449;
+            splitContainer.SplitterWidth = 8;
             splitContainer.TabIndex = 0;
             // 
             // leftPanel
@@ -85,9 +87,9 @@ namespace LogInterpreter.WinForms
             pipelineListBox.Dock = DockStyle.Fill;
             pipelineListBox.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 238);
             pipelineListBox.FormattingEnabled = true;
-            pipelineListBox.Location = new Point(0, 20);
+            pipelineListBox.Location = new Point(0, 15);
             pipelineListBox.Name = "pipelineListBox";
-            pipelineListBox.Size = new Size(449, 580);
+            pipelineListBox.Size = new Size(449, 585);
             pipelineListBox.TabIndex = 1;
             pipelineListBox.SelectedIndexChanged += pipelineListBox_SelectedIndexChanged;
             // 
@@ -95,33 +97,42 @@ namespace LogInterpreter.WinForms
             // 
             pipelineLabel.AutoSize = true;
             pipelineLabel.Dock = DockStyle.Top;
-            pipelineLabel.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 238);
+            pipelineLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 238);
             pipelineLabel.Location = new Point(0, 0);
             pipelineLabel.Name = "pipelineLabel";
-            pipelineLabel.Size = new Size(64, 20);
+            pipelineLabel.Size = new Size(51, 15);
             pipelineLabel.TabIndex = 0;
             pipelineLabel.Text = "Pipeline";
             // 
             // rightPanel
             // 
+            rightPanel.Controls.Add(configurationPanel);
             rightPanel.Controls.Add(configurationLabel);
             rightPanel.Controls.Add(propertiesPanel);
             rightPanel.Controls.Add(propertiesLabel);
             rightPanel.Dock = DockStyle.Fill;
             rightPanel.Location = new Point(0, 0);
             rightPanel.Name = "rightPanel";
-            rightPanel.Padding = new Padding(10);
-            rightPanel.Size = new Size(537, 600);
+            rightPanel.Size = new Size(533, 600);
             rightPanel.TabIndex = 0;
+            // 
+            // configurationPanel
+            // 
+            configurationPanel.AutoScroll = true;
+            configurationPanel.Dock = DockStyle.Fill;
+            configurationPanel.Location = new Point(0, 121);
+            configurationPanel.Name = "configurationPanel";
+            configurationPanel.Size = new Size(533, 479);
+            configurationPanel.TabIndex = 3;
             // 
             // configurationLabel
             // 
             configurationLabel.AutoSize = true;
             configurationLabel.Dock = DockStyle.Top;
-            configurationLabel.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 238);
-            configurationLabel.Location = new Point(10, 121);
+            configurationLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 238);
+            configurationLabel.Location = new Point(0, 106);
             configurationLabel.Name = "configurationLabel";
-            configurationLabel.Size = new Size(106, 20);
+            configurationLabel.Size = new Size(83, 15);
             configurationLabel.TabIndex = 2;
             configurationLabel.Text = "Configuration";
             // 
@@ -134,9 +145,9 @@ namespace LogInterpreter.WinForms
             propertiesPanel.Controls.Add(typeNameTextBox);
             propertiesPanel.Controls.Add(typeNameLabel);
             propertiesPanel.Dock = DockStyle.Top;
-            propertiesPanel.Location = new Point(10, 30);
+            propertiesPanel.Location = new Point(0, 15);
             propertiesPanel.Name = "propertiesPanel";
-            propertiesPanel.Size = new Size(517, 91);
+            propertiesPanel.Size = new Size(533, 91);
             propertiesPanel.TabIndex = 0;
             // 
             // outputTypeTextBox
@@ -145,7 +156,7 @@ namespace LogInterpreter.WinForms
             outputTypeTextBox.Location = new Point(84, 61);
             outputTypeTextBox.Name = "outputTypeTextBox";
             outputTypeTextBox.ReadOnly = true;
-            outputTypeTextBox.Size = new Size(429, 23);
+            outputTypeTextBox.Size = new Size(445, 23);
             outputTypeTextBox.TabIndex = 5;
             // 
             // outputTypeLabel
@@ -163,7 +174,7 @@ namespace LogInterpreter.WinForms
             inputTypeTextBox.Location = new Point(84, 32);
             inputTypeTextBox.Name = "inputTypeTextBox";
             inputTypeTextBox.ReadOnly = true;
-            inputTypeTextBox.Size = new Size(429, 23);
+            inputTypeTextBox.Size = new Size(445, 23);
             inputTypeTextBox.TabIndex = 3;
             // 
             // inputTypeLabel
@@ -181,7 +192,7 @@ namespace LogInterpreter.WinForms
             typeNameTextBox.Location = new Point(84, 3);
             typeNameTextBox.Name = "typeNameTextBox";
             typeNameTextBox.ReadOnly = true;
-            typeNameTextBox.Size = new Size(429, 23);
+            typeNameTextBox.Size = new Size(445, 23);
             typeNameTextBox.TabIndex = 1;
             // 
             // typeNameLabel
@@ -197,10 +208,10 @@ namespace LogInterpreter.WinForms
             // 
             propertiesLabel.AutoSize = true;
             propertiesLabel.Dock = DockStyle.Top;
-            propertiesLabel.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 238);
-            propertiesLabel.Location = new Point(10, 10);
+            propertiesLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 238);
+            propertiesLabel.Location = new Point(0, 0);
             propertiesLabel.Name = "propertiesLabel";
-            propertiesLabel.Size = new Size(81, 20);
+            propertiesLabel.Size = new Size(65, 15);
             propertiesLabel.TabIndex = 1;
             propertiesLabel.Text = "Properties";
             // 
@@ -243,5 +254,6 @@ namespace LogInterpreter.WinForms
         private TextBox typeNameTextBox;
         private Label typeNameLabel;
         private Label configurationLabel;
+        private Panel configurationPanel;
     }
 }
