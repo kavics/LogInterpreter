@@ -46,7 +46,6 @@ namespace LogInterpreter.WinForms
                 .AddItem(pipelineErrorAggregator)
                 .AddItem(new Filter<LogEntry>(e =>
                 {
-                    return true;
                     if (e.Message.StartsWith("Updating rental status"))
                         return true;
                     if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
@@ -426,6 +425,8 @@ namespace LogInterpreter.WinForms
 
             using var editForm = new EditForm(currentPipeline);
             editForm.ShowDialog(this);
+
+            RunPipeline();
         }
 
         private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
