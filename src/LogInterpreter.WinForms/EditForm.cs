@@ -135,7 +135,7 @@ namespace LogInterpreter.WinForms
                     var typeInfoLabel = new Label
                     {
                         Text = funcTypeInfo,
-                        Location = new Point(leftMargin + 20, yPosition),
+                        Location = new Point(leftMargin, yPosition),
                         AutoSize = true,
                         MaximumSize = new Size(configurationPanel.Width - leftMargin - rightMargin - 40, 0),
                         Font = new Font("Segoe UI", 8.25F, FontStyle.Italic)
@@ -143,7 +143,7 @@ namespace LogInterpreter.WinForms
                     configurationPanel.Controls.Add(typeInfoLabel);
                     yPosition += typeInfoLabel.Height + 5;
 
-                    // Create multiline textbox for Func - now editable
+                    // Create multiline textbox for Func
                     var textBox = new TextBox
                     {
                         Location = new Point(leftMargin, yPosition),
@@ -152,8 +152,7 @@ namespace LogInterpreter.WinForms
                         Multiline = true,
                         ScrollBars = ScrollBars.Both,
                         Font = new Font("Consolas", 9F),
-                        Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
-                        ReadOnly = false // Make it editable
+                        Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
                     };
 
                     // Try to get current value and display it
@@ -162,16 +161,11 @@ namespace LogInterpreter.WinForms
                         var funcValue = property.GetValue(item);
                         if (funcValue != null)
                         {
-                            textBox.Text = $"// Function: {property.Name}\n// Type: {property.PropertyType.Name}\n// Note: Function editing is for documentation/reference only.\n// The actual function behavior cannot be modified at runtime.";
+                            textBox.Text = $"// Function: {property.Name}\n// Type: {property.PropertyType.Name}\n// This is a compiled function and cannot be edited directly.";
+                            textBox.ReadOnly = true;
                         }
                     }
                     catch { }
-
-                    // Store property reference for later update
-                    textBox.Tag = new Tuple<IPipelineItem, PropertyInfo>(item, property);
-                    
-                    // Add event handler for focus loss
-                    textBox.Leave += FuncTextBox_Leave;
 
                     configurationPanel.Controls.Add(textBox);
                     yPosition += textBox.Height + spacing;
@@ -197,12 +191,6 @@ namespace LogInterpreter.WinForms
                         }
                     }
                     catch { }
-
-                    // Store property reference for later update
-                    textBox.Tag = new Tuple<IPipelineItem, PropertyInfo>(item, property);
-                    
-                    // Add event handler for focus loss
-                    textBox.Leave += PathTextBox_Leave;
 
                     var browseButton = new Button
                     {
@@ -244,10 +232,6 @@ namespace LogInterpreter.WinForms
                         }
                         catch { }
 
-                        // Store property reference
-                        checkBox.Tag = new Tuple<IPipelineItem, PropertyInfo>(item, property);
-                        checkBox.CheckedChanged += CheckBox_CheckedChanged;
-
                         inputControl = checkBox;
                     }
                     else if (property.PropertyType == typeof(int) || 
@@ -259,9 +243,7 @@ namespace LogInterpreter.WinForms
                         {
                             Location = new Point(leftMargin, yPosition),
                             Width = configurationPanel.Width - leftMargin - rightMargin - 20,
-                            Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
-                            Minimum = decimal.MinValue,
-                            Maximum = decimal.MaxValue
+                            Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
                         };
 
                         try
@@ -273,10 +255,6 @@ namespace LogInterpreter.WinForms
                             }
                         }
                         catch { }
-
-                        // Store property reference
-                        numericUpDown.Tag = new Tuple<IPipelineItem, PropertyInfo>(item, property);
-                        numericUpDown.Leave += NumericUpDown_Leave;
 
                         inputControl = numericUpDown;
                     }
@@ -299,10 +277,6 @@ namespace LogInterpreter.WinForms
                             }
                         }
                         catch { }
-
-                        // Store property reference
-                        textBox.Tag = new Tuple<IPipelineItem, PropertyInfo>(item, property);
-                        textBox.Leave += DefaultTextBox_Leave;
 
                         inputControl = textBox;
                     }
@@ -351,141 +325,13 @@ namespace LogInterpreter.WinForms
                 {
                     textBox.Text = openFileDialog.FileName;
                     
-                    // Update the property value immediately after dialog closes
+                    // Update the property value
                     try
                     {
-                        if (property.PropertyType == typeof(string))
-                        {
-                            property.SetValue(item, openFileDialog.FileName);
-                        }
+                        property.SetValue(item, openFileDialog.FileName);
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error updating property '{property.Name}': {ex.Message}", 
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    catch { }
                 }
-            }
-        }
-
-        private void PathTextBox_Leave(object? sender, EventArgs e)
-        {
-            if (sender is TextBox textBox && textBox.Tag is Tuple<IPipelineItem, PropertyInfo> data)
-            {
-                var (item, property) = data;
-                UpdatePropertyValue(item, property, textBox.Text);
-            }
-        }
-
-        private void DefaultTextBox_Leave(object? sender, EventArgs e)
-        {
-            if (sender is TextBox textBox && textBox.Tag is Tuple<IPipelineItem, PropertyInfo> data)
-            {
-                var (item, property) = data;
-                UpdatePropertyValue(item, property, textBox.Text);
-            }
-        }
-
-        private void FuncTextBox_Leave(object? sender, EventArgs e)
-        {
-            if (sender is TextBox textBox && textBox.Tag is Tuple<IPipelineItem, PropertyInfo> data)
-            {
-                var (item, property) = data;
-                // For Func properties, we store the text but can't actually modify the function
-                // This is mainly for documentation/reference purposes
-                // You might want to add logging or other handling here
-            }
-        }
-
-        private void NumericUpDown_Leave(object? sender, EventArgs e)
-        {
-            if (sender is NumericUpDown numericUpDown && numericUpDown.Tag is Tuple<IPipelineItem, PropertyInfo> data)
-            {
-                var (item, property) = data;
-                UpdatePropertyValue(item, property, numericUpDown.Value);
-            }
-        }
-
-        private void CheckBox_CheckedChanged(object? sender, EventArgs e)
-        {
-            if (sender is CheckBox checkBox && checkBox.Tag is Tuple<IPipelineItem, PropertyInfo> data)
-            {
-                var (item, property) = data;
-                UpdatePropertyValue(item, property, checkBox.Checked);
-            }
-        }
-
-        private void UpdatePropertyValue(IPipelineItem item, PropertyInfo property, object? value)
-        {
-            try
-            {
-                if (value == null)
-                {
-                    if (property.PropertyType.IsValueType && 
-                        Nullable.GetUnderlyingType(property.PropertyType) == null)
-                    {
-                        // Cannot set null to non-nullable value type
-                        return;
-                    }
-                    property.SetValue(item, null);
-                    return;
-                }
-
-                // Handle type conversion
-                if (property.PropertyType == typeof(string))
-                {
-                    property.SetValue(item, value.ToString());
-                }
-                else if (property.PropertyType == typeof(int))
-                {
-                    property.SetValue(item, Convert.ToInt32(value));
-                }
-                else if (property.PropertyType == typeof(long))
-                {
-                    property.SetValue(item, Convert.ToInt64(value));
-                }
-                else if (property.PropertyType == typeof(double))
-                {
-                    property.SetValue(item, Convert.ToDouble(value));
-                }
-                else if (property.PropertyType == typeof(decimal))
-                {
-                    property.SetValue(item, Convert.ToDecimal(value));
-                }
-                else if (property.PropertyType == typeof(bool))
-                {
-                    property.SetValue(item, Convert.ToBoolean(value));
-                }
-                else if (property.PropertyType == typeof(int?))
-                {
-                    property.SetValue(item, string.IsNullOrWhiteSpace(value.ToString()) ? null : (int?)Convert.ToInt32(value));
-                }
-                else if (property.PropertyType == typeof(long?))
-                {
-                    property.SetValue(item, string.IsNullOrWhiteSpace(value.ToString()) ? null : (long?)Convert.ToInt64(value));
-                }
-                else if (property.PropertyType == typeof(double?))
-                {
-                    property.SetValue(item, string.IsNullOrWhiteSpace(value.ToString()) ? null : (double?)Convert.ToDouble(value));
-                }
-                else if (property.PropertyType == typeof(decimal?))
-                {
-                    property.SetValue(item, string.IsNullOrWhiteSpace(value.ToString()) ? null : (decimal?)Convert.ToDecimal(value));
-                }
-                else if (property.PropertyType == typeof(bool?))
-                {
-                    property.SetValue(item, string.IsNullOrWhiteSpace(value.ToString()) ? null : (bool?)Convert.ToBoolean(value));
-                }
-                else
-                {
-                    // Try direct assignment
-                    property.SetValue(item, value);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error updating property '{property.Name}': {ex.Message}", 
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

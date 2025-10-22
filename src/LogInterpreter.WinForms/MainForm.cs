@@ -233,6 +233,26 @@ namespace LogInterpreter.WinForms
             };
             logDataGridView.Columns.Add(durationColumn);
 
+            // UserId oszlop (unbound - Properties dictionary-ból töltjük)
+            var userIdColumn = new DataGridViewTextBoxColumn
+            {
+                Name = "UserId",
+                HeaderText = "UserId",
+                Width = 80,
+                ReadOnly = true
+            };
+            logDataGridView.Columns.Add(userIdColumn);
+
+            // UserEmail oszlop (unbound - Properties dictionary-ból töltjük)
+            var userEmailColumn = new DataGridViewTextBoxColumn
+            {
+                Name = "UserEmail",
+                HeaderText = "UserEmail",
+                Width = 150,
+                ReadOnly = true
+            };
+            logDataGridView.Columns.Add(userEmailColumn);
+
             // Üzenet oszlop (kitölti a fennmaradó helyet)
             var messageColumn = new DataGridViewTextBoxColumn
             {
@@ -254,6 +274,32 @@ namespace LogInterpreter.WinForms
 
             var entry = logEntries[e.RowIndex];
             var row = logDataGridView.Rows[e.RowIndex];
+
+            // UserId és UserEmail oszlopok feltöltése Properties-bõl
+            if (logDataGridView.Columns[e.ColumnIndex].Name == "UserId")
+            {
+                if (entry.Properties != null && entry.Properties.TryGetValue("UserId", out var userId))
+                {
+                    e.Value = userId;
+                }
+                else
+                {
+                    e.Value = string.Empty;
+                }
+                e.FormattingApplied = true;
+            }
+            else if (logDataGridView.Columns[e.ColumnIndex].Name == "UserEmail")
+            {
+                if (entry.Properties != null && entry.Properties.TryGetValue("UserEmail", out var userEmail))
+                {
+                    e.Value = userEmail;
+                }
+                else
+                {
+                    e.Value = string.Empty;
+                }
+                e.FormattingApplied = true;
+            }
 
             // Sor színezése a log szint alapján
             switch (entry.Level)
@@ -495,11 +541,14 @@ namespace LogInterpreter.WinForms
             using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
             
             // Fejléc
-            writer.WriteLine("Time,Level,LineId,Category,ProgramFlowId,OpId,Status,Duration,Message");
+            writer.WriteLine("Time,Level,LineId,Category,ProgramFlowId,OpId,Status,Duration,UserId,UserEmail,Message");
             
             // Adatok
             foreach (var entry in logEntries)
             {
+                var userId = entry.Properties?.TryGetValue("UserId", out var uid) == true ? uid : string.Empty;
+                var userEmail = entry.Properties?.TryGetValue("UserEmail", out var email) == true ? email : string.Empty;
+
                 writer.WriteLine($"\"{entry.Time:yyyy-MM-dd HH:mm:ss.fff}\"," +
                                $"\"{entry.Level}\"," +
                                $"{entry.LineId}," +
@@ -508,6 +557,8 @@ namespace LogInterpreter.WinForms
                                $"{entry.OpId}," +
                                $"\"{EscapeCsv(entry.Status)}\"," +
                                $"\"{entry.Duration:hh\\:mm\\:ss\\.fff}\"," +
+                               $"\"{EscapeCsv(userId)}\"," +
+                               $"\"{EscapeCsv(userEmail)}\"," +
                                $"\"{EscapeCsv(entry.Message)}\"");
             }
         }
@@ -518,11 +569,16 @@ namespace LogInterpreter.WinForms
             
             foreach (var entry in logEntries)
             {
+                var userId = entry.Properties?.TryGetValue("UserId", out var uid) == true ? uid : "N/A";
+                var userEmail = entry.Properties?.TryGetValue("UserEmail", out var email) == true ? email : string.Empty;
+
                 writer.WriteLine($"{entry.Time:yyyy-MM-dd HH:mm:ss.fff} " +
                                $"[{entry.Level,-11}] " +
                                $"{entry.Category,-15} " +
                                $"PF:{entry.ProgramFlowId,-8} " +
                                $"Op:{entry.OpId,-5} " +
+                               $"User:{userId,-8} " +
+                               $"{userEmail,-25} " +
                                $"{entry.Message}");
             }
         }
