@@ -33,11 +33,21 @@ namespace LogInterpreter.WinForms
             pipelineListBox = new ListBox();
             pipelineLabel = new Label();
             rightPanel = new Panel();
+            detailsPanel = new Panel();
+            outputTypeTextBox = new TextBox();
+            outputTypeLabel = new Label();
+            inputTypeTextBox = new TextBox();
+            inputTypeLabel = new Label();
+            typeNameTextBox = new TextBox();
+            typeNameLabel = new Label();
+            propertiesLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
             splitContainer.Panel1.SuspendLayout();
             splitContainer.Panel2.SuspendLayout();
             splitContainer.SuspendLayout();
             leftPanel.SuspendLayout();
+            rightPanel.SuspendLayout();
+            detailsPanel.SuspendLayout();
             SuspendLayout();
             // 
             // splitContainer
@@ -74,30 +84,111 @@ namespace LogInterpreter.WinForms
             pipelineListBox.Dock = DockStyle.Fill;
             pipelineListBox.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 238);
             pipelineListBox.FormattingEnabled = true;
-            pipelineListBox.Location = new Point(0, 20);
+            pipelineListBox.Location = new Point(0, 15);
             pipelineListBox.Name = "pipelineListBox";
-            pipelineListBox.Size = new Size(449, 580);
+            pipelineListBox.Size = new Size(449, 585);
             pipelineListBox.TabIndex = 1;
+            pipelineListBox.SelectedIndexChanged += pipelineListBox_SelectedIndexChanged;
             // 
             // pipelineLabel
             // 
             pipelineLabel.AutoSize = true;
             pipelineLabel.Dock = DockStyle.Top;
-            pipelineLabel.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 238);
+            pipelineLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 238);
             pipelineLabel.Location = new Point(0, 0);
             pipelineLabel.Name = "pipelineLabel";
-            pipelineLabel.Size = new Size(64, 20);
+            pipelineLabel.Size = new Size(51, 15);
             pipelineLabel.TabIndex = 0;
             pipelineLabel.Text = "Pipeline";
             // 
             // rightPanel
             // 
+            rightPanel.Controls.Add(detailsPanel);
+            rightPanel.Controls.Add(propertiesLabel);
             rightPanel.Dock = DockStyle.Fill;
             rightPanel.Location = new Point(0, 0);
             rightPanel.Name = "rightPanel";
-            rightPanel.Padding = new Padding(10);
             rightPanel.Size = new Size(537, 600);
             rightPanel.TabIndex = 0;
+            // 
+            // detailsPanel
+            // 
+            detailsPanel.Controls.Add(outputTypeTextBox);
+            detailsPanel.Controls.Add(outputTypeLabel);
+            detailsPanel.Controls.Add(inputTypeTextBox);
+            detailsPanel.Controls.Add(inputTypeLabel);
+            detailsPanel.Controls.Add(typeNameTextBox);
+            detailsPanel.Controls.Add(typeNameLabel);
+            detailsPanel.Dock = DockStyle.Top;
+            detailsPanel.Location = new Point(0, 15);
+            detailsPanel.Name = "detailsPanel";
+            detailsPanel.Size = new Size(537, 89);
+            detailsPanel.TabIndex = 0;
+            // 
+            // outputTypeTextBox
+            // 
+            outputTypeTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            outputTypeTextBox.Location = new Point(90, 58);
+            outputTypeTextBox.Name = "outputTypeTextBox";
+            outputTypeTextBox.ReadOnly = true;
+            outputTypeTextBox.Size = new Size(444, 23);
+            outputTypeTextBox.TabIndex = 5;
+            // 
+            // outputTypeLabel
+            // 
+            outputTypeLabel.AutoSize = true;
+            outputTypeLabel.Location = new Point(4, 61);
+            outputTypeLabel.Name = "outputTypeLabel";
+            outputTypeLabel.Size = new Size(75, 15);
+            outputTypeLabel.TabIndex = 4;
+            outputTypeLabel.Text = "Output Type:";
+            // 
+            // inputTypeTextBox
+            // 
+            inputTypeTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            inputTypeTextBox.Location = new Point(90, 29);
+            inputTypeTextBox.Name = "inputTypeTextBox";
+            inputTypeTextBox.ReadOnly = true;
+            inputTypeTextBox.Size = new Size(444, 23);
+            inputTypeTextBox.TabIndex = 3;
+            // 
+            // inputTypeLabel
+            // 
+            inputTypeLabel.AutoSize = true;
+            inputTypeLabel.Location = new Point(3, 32);
+            inputTypeLabel.Name = "inputTypeLabel";
+            inputTypeLabel.Size = new Size(65, 15);
+            inputTypeLabel.TabIndex = 2;
+            inputTypeLabel.Text = "Input Type:";
+            // 
+            // typeNameTextBox
+            // 
+            typeNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            typeNameTextBox.Location = new Point(90, 3);
+            typeNameTextBox.Name = "typeNameTextBox";
+            typeNameTextBox.ReadOnly = true;
+            typeNameTextBox.Size = new Size(444, 23);
+            typeNameTextBox.TabIndex = 1;
+            // 
+            // typeNameLabel
+            // 
+            typeNameLabel.AutoSize = true;
+            typeNameLabel.Location = new Point(4, 6);
+            typeNameLabel.Name = "typeNameLabel";
+            typeNameLabel.Size = new Size(34, 15);
+            typeNameLabel.TabIndex = 0;
+            typeNameLabel.Text = "Type:";
+            // 
+            // propertiesLabel
+            // 
+            propertiesLabel.AutoSize = true;
+            propertiesLabel.Dock = DockStyle.Top;
+            propertiesLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 238);
+            propertiesLabel.Location = new Point(0, 0);
+            propertiesLabel.Name = "propertiesLabel";
+            propertiesLabel.Size = new Size(65, 15);
+            propertiesLabel.TabIndex = 1;
+            propertiesLabel.Text = "Properties";
             // 
             // EditForm
             // 
@@ -115,6 +206,10 @@ namespace LogInterpreter.WinForms
             splitContainer.ResumeLayout(false);
             leftPanel.ResumeLayout(false);
             leftPanel.PerformLayout();
+            rightPanel.ResumeLayout(false);
+            rightPanel.PerformLayout();
+            detailsPanel.ResumeLayout(false);
+            detailsPanel.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -125,5 +220,13 @@ namespace LogInterpreter.WinForms
         private ListBox pipelineListBox;
         private Label pipelineLabel;
         private Panel rightPanel;
+        private Label propertiesLabel;
+        private Panel detailsPanel;
+        private TextBox outputTypeTextBox;
+        private Label outputTypeLabel;
+        private TextBox inputTypeTextBox;
+        private Label inputTypeLabel;
+        private TextBox typeNameTextBox;
+        private Label typeNameLabel;
     }
 }
