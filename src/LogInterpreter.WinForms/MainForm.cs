@@ -65,6 +65,12 @@ namespace LogInterpreter.WinForms
             // BindingSource beállítása
             logBindingSource.DataSource = logEntries;
 
+            // Cella keretezés eltávolítása
+            logDataGridView.CellBorderStyle = DataGridViewCellBorderStyle.None;
+
+            // Sorok átméretezésének tiltása
+            logDataGridView.AllowUserToResizeRows = false;
+
             // Oszlopok manuális konfigurálása
             SetupColumns();
 
