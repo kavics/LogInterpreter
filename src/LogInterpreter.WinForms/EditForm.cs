@@ -161,14 +161,31 @@ namespace LogInterpreter.WinForms
                         var funcValue = property.GetValue(item);
                         if (funcValue != null)
                         {
-                            textBox.Text = $"// Function: {property.Name}\n// Type: {property.PropertyType.Name}\n// This is a compiled function and cannot be edited directly.";
-                            textBox.ReadOnly = true;
+                            textBox.Text = $"return x.Level != LogLevel.Debug && x.Level != LogLevel.Trace";
+                            textBox.ReadOnly = false;
                         }
                     }
                     catch { }
 
                     configurationPanel.Controls.Add(textBox);
-                    yPosition += textBox.Height + spacing;
+                    yPosition += textBox.Height + 5;
+
+                    // Add Compile button for Func types
+                    var compileButton = new Button
+                    {
+                        Text = "Compile",
+                        Location = new Point(leftMargin, yPosition),
+                        Width = 100,
+                        Height = controlHeight,
+                        Anchor = AnchorStyles.Top | AnchorStyles.Left
+                    };
+
+                    // Store property and textbox reference in button tag
+                    compileButton.Tag = new Tuple<IPipelineItem, PropertyInfo, TextBox>(item, property, textBox);
+                    compileButton.Click += CompileButton_Click;
+
+                    configurationPanel.Controls.Add(compileButton);
+                    yPosition += controlHeight + spacing;
                 }
                 // Handle Path configuration type
                 else if (configurableAttr.Type == ConfigurationType.Path)
@@ -287,6 +304,19 @@ namespace LogInterpreter.WinForms
             }
 
             configurationPanel.ResumeLayout();
+        }
+
+        private void CompileButton_Click(object? sender, EventArgs e)
+        {
+            if (sender is Button button && button.Tag is Tuple<IPipelineItem, PropertyInfo, TextBox> data)
+            {
+                var (item, property, textBox) = data;
+
+                // TODO: Implement compilation logic
+Func<LogEntry, bool> func = x => x.Level != LogLevel.Debug && x.Level != LogLevel.Trace;
+var setter = data.Item2.GetSetMethod();
+setter.Invoke(data.Item1, new[] { func });
+            }
         }
 
         private void BrowseButton_Click(object? sender, EventArgs e)
