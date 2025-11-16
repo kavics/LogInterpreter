@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogInterpreter.CLI;
 
@@ -363,7 +364,7 @@ internal static class TestsForDev
             .Run();
     }
 
-    internal static void CompactJsonParser_Manfred_LiveTest2027_07_12()
+    internal static void CompactJsonParser_Manfred_LiveTest2025_07_12()
     {
         var counter = new Counter();
         var errorAggregator = new ErrorAggregator();
@@ -415,6 +416,79 @@ internal static class TestsForDev
 
         Console.Write("Writing error-aggregation file... ");
         errorAggregator.WriteToFile(@"D:\__temp\logs\analízis\Manfred_LiveTest2027_07_12-ERRORS.txt");
+        Console.WriteLine("Ok");
+
+    }
+
+    internal static void CompactJsonParser_Manfred_2025_10_26()
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        var counter = new Counter();
+        var errorAggregator = new ErrorAggregator();
+        var rentalCollector = new ManfredRentalCollector();
+        var collector = new ManfredUnfinishedRentalCollector();
+        var pattern2 = @"Rental (\d+) initiated for user (\S+)";
+
+        new Pipeline()
+            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod_2025-11-14_2-31-00", @"log-20250912_165517.txt"))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(counter)
+            .AddItem(errorAggregator)
+            .AddItem(rentalCollector)
+            //.AddItem(new Filter<LogEntry>(e =>
+            //{
+            //    if (e.Message.StartsWith("Updating rental status"))
+            //        return true;
+            //    if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
+            //        return true;
+            //    if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
+            //        return true;
+            //    return false;
+            //}))
+            //.AddItem(new Formatter<LogEntry>(entry =>
+            //{
+            //    if (!entry.Properties.TryGetValue("RentalId", out var rental))
+            //        rental = "";
+            //    if (!entry.Properties.TryGetValue("UserEmail", out var user))
+            //        user = "unknown";
+            //    if (!entry.Properties.TryGetValue("Bicycle", out var bicycle))
+            //        user = "----";
+
+            //    var message = entry.Message
+            //        .Replace("Rental {RentalId} started for user {UserEmail}", "Rental start")
+            //        .Replace("Updating rental status: ", "")
+            //        .Replace("Updating rental status after wait for close: ", "");
+            //    return $"{entry.Time.ToUniversalTime():yyyy-MM-dd HH:mm:ss.fff} #{rental} &{bicycle} @{user,-32} {message}";
+            //}))
+            //.AddItem(new ConsoleWriter())
+            //.AddItem(new FileWriter(@"D:\__temp\logs\analízis\Manfred_2025_10_26\Rentals.txt"))
+            .Run();
+
+        Console.WriteLine("===========================================================");
+        Console.WriteLine($"Entries:           {counter.Entries,8}");
+        Console.WriteLine($"NotParsed:         {counter.NotParsedEntries,8}");
+        Console.WriteLine("LEVELS");
+        Console.WriteLine($"  Informations:    {counter.Informations,8}");
+        Console.WriteLine($"  Warnings:        {counter.Warnings,8}");
+        Console.WriteLine($"  Errors:          {counter.Errors,8}");
+        Console.WriteLine("CATEGORIES");
+        foreach (var category in counter.Categories)
+            Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
+
+        Console.Write("Writing error-aggregation file... ");
+        errorAggregator.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_10_26\ERRORS.txt");
+        Console.WriteLine("Ok");
+
+        Console.Write("Writing rental-collection file... ");
+        rentalCollector.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_10_26\Rentals.txt");
+        Console.WriteLine("Ok");
+
+        stopwatch.Stop();
+        Console.WriteLine($"Processing time {stopwatch.Elapsed}.");
+
         Console.WriteLine("Ok");
 
     }
@@ -677,5 +751,126 @@ internal class FirstLineReader : IPipelineItem<string, string>
                     yield return line;
             }
         }
+    }
+}
+
+
+internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>
+{
+    private class Rental
+    {
+        public string Id { get; set; }
+        public string Renter { get; set; }
+        public string Bicycle { get; set; }
+        public bool Finished { get; set; }
+        public bool Problematic { get; set; } = true;
+        public List<string> Log { get; } = new List<string>();
+    }
+
+    public string Name => this.GetType().Name;
+
+    public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
+
+    private Dictionary<string, Rental> _rentals = new();
+
+    public IEnumerator<LogEntry> GetEnumerator()
+    {
+        foreach (var entry in Input)
+        {
+            if(EntryFilter(entry))
+            {
+                var formatted = Format(entry, out var rentalId, out var renter, out var bicycle);
+                if (rentalId != null)
+                {
+                    if (!_rentals.TryGetValue(rentalId, out var rental))
+                    {
+                        rental = new Rental();
+                        _rentals.Add(rentalId, rental);
+                    }
+
+                    if (rentalId != null)
+                        rental.Id = rentalId;
+                    if (renter != null)
+                        rental.Renter = renter;
+                    if (bicycle != null)
+                        rental.Bicycle = bicycle;
+
+                    if (formatted.EndsWith("--> Error"))
+                    {
+                        rental.Finished = true;
+                    }
+                    if (formatted.EndsWith("--> Finished"))
+                    {
+                        rental.Problematic = false;
+                        rental.Finished = true;
+                    }
+                    rental.Log.Add(formatted);
+                }
+            }
+
+            yield return entry;
+        }
+    }
+    private bool EntryFilter(LogEntry e)
+    {
+        if (e.Message.StartsWith("Updating rental status"))
+            return true;
+        if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
+            return true;
+        if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
+            return true;
+        return false;
+    }
+    private string Format(LogEntry entry, out string? rental, out string? renter, out string? bicycle)
+    {
+        entry.Properties.TryGetValue("RentalId", out rental);
+        entry.Properties.TryGetValue("UserEmail", out renter);
+        entry.Properties.TryGetValue("Bicycle", out bicycle);
+        
+        var message = entry.Message
+            .Replace("Rental {RentalId} started for user {UserEmail}", "Rental start")
+            .Replace("Rental {RentalId} initiated for user {UserEmail}", "Rental start")
+            .Replace("Updating rental status: ", "")
+            .Replace("Updating rental status after wait for close: ", "")
+            .Replace("Updating rental status after wait for open: ", "");
+
+        return $"{entry.Time.ToUniversalTime():yyyy-MM-dd HH:mm:ss.fff}\t{message}".Trim();
+    }
+
+    public void WriteToFile(string filePath)
+    {
+        using var writer = new StreamWriter(filePath, Encoding.UTF8, new FileStreamOptions
+        {
+            Access = FileAccess.Write,
+            Mode = FileMode.OpenOrCreate
+        });
+
+        var count = 0;
+        var problematicCount = 0;
+        var finishedCount = 0;
+
+        foreach (var item in _rentals)
+        {
+            var rental = item.Value;
+
+            count++;
+            if (rental.Problematic)
+                problematicCount++;
+            if (rental.Finished)
+                finishedCount++;
+
+            writer.WriteLine($"#{rental.Id} &{rental.Bicycle} @{rental.Renter} " +
+                $"{(rental.Problematic ? "!" : "")} {(rental.Finished ? "" : "RUNNING")}");
+
+            foreach (var line in rental.Log)
+            {
+                writer.WriteLine (line);
+            }
+        }
+        writer.WriteLine("===================================================");
+        writer.WriteLine($"TOTAL RENTALS: {count}");
+        writer.WriteLine($"PROBLEMATIC RENTALS: {problematicCount}");
+        writer.WriteLine($"FINISHED RENTALS: {finishedCount}");
+        writer.WriteLine($"RUNNING RENTALS: {count - finishedCount}");
     }
 }

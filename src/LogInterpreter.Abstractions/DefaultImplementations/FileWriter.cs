@@ -18,6 +18,10 @@ namespace LogInterpreter.Abstractions.DefaultImplementations
 
         public IEnumerator<string> GetEnumerator()
         {
+            var directory = Path.GetDirectoryName(this.FilePath);
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             using var fileStream = new System.IO.FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write);
             using var writer = new StreamWriter(fileStream, Encoding.UTF8);
             foreach (var line in Input)

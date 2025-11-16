@@ -66,6 +66,6 @@ public class CompactJsonLogParser : IPipelineItem<string, LogEntry>
             if (string.Compare(raw, "Verbose") == 0)
                 return LogLevel.Trace;
         }
-        return LogLevel.Critical;
+        return LogLevel.Information;
     }
 }
