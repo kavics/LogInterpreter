@@ -428,14 +428,17 @@ internal static class TestsForDev
         var errorAggregator = new ErrorAggregator();
         var rentalCollector = new ManfredRentalCollector();
         var collector = new ManfredUnfinishedRentalCollector();
+        var webRequestCollector = new ManfredWebRequestCollector();
         var pattern2 = @"Rental (\d+) initiated for user (\S+)";
 
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod_2025-11-14_2-31-00", @"log-20250912_165517.txt"))
+            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20250625_124309.txt"))
+//            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20251103_034508.txt"))
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
             .AddItem(counter)
+            .AddItem(webRequestCollector)
             .AddItem(errorAggregator)
             .AddItem(rentalCollector)
             //.AddItem(new Filter<LogEntry>(e =>
@@ -477,6 +480,14 @@ internal static class TestsForDev
         Console.WriteLine("CATEGORIES");
         foreach (var category in counter.Categories)
             Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
+
+        Console.WriteLine("WEB REQUESTS:");
+        Console.WriteLine($"  count:           {webRequestCollector.RequestCount,8}");
+        Console.WriteLine($"  long count:      {webRequestCollector.LongCount,8}");
+        Console.WriteLine($"  very long count: {webRequestCollector.VeryLongCount,8}");
+        Console.WriteLine($"  average time:       {webRequestCollector.AverageTime:F2} ms");
+        Console.WriteLine($"  longest time:       {webRequestCollector.LongestTimeSec:F2} sec");
+        Console.WriteLine($"  longest key:        {webRequestCollector.LongestRequestId:F2}");
 
         Console.Write("Writing error-aggregation file... ");
         errorAggregator.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_10_26\ERRORS.txt");
@@ -723,6 +734,52 @@ internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
             yield return kvp;
     }
 }
+
+internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>
+{
+    public string Name => this.GetType().Name;
+
+    public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
+
+    private Dictionary<string, (int Count, DateTime FirstTime, DateTime LastTime)> _requestEntries = new();
+    public int RequestCount { get; private set; }
+    public double AverageTime { get; private set; }
+    public int LongCount { get; private set; }
+    public int VeryLongCount { get; private set; }
+    public double LongestTimeSec { get; private set; }
+    public string LongestRequestId { get; private set; }
+
+    public IEnumerator<LogEntry> GetEnumerator()
+    {
+        foreach (var entry in Input)
+        {
+            if (entry.Message == "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms")
+            {
+                var valueRaw = entry.Properties["Elapsed"];
+                var value = Convert.ToDouble(valueRaw);
+                var valueSec = value / 1000.0;
+
+                if (value > 4.0)
+                    LongCount++;
+                if (value > 10.0)
+                    VeryLongCount++;
+
+                if (valueSec > LongestTimeSec)
+                {
+                    LongestTimeSec = valueSec;
+                    entry.Properties.TryGetValue("RequestId", out var requestId);
+                    LongestRequestId = requestId ?? "unknown";
+                }
+
+                RequestCount++;
+                AverageTime += (value - AverageTime) / RequestCount;
+            }
+
+            yield return entry;
+        }
+    }
+}
+
 
 internal class FirstLineReader : IPipelineItem<string, string>
 {
