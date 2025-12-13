@@ -493,6 +493,62 @@ internal static class TestsForDev
 
     }
 
+    internal static void CompactJsonParser_Manfred_SecurityQueueError()
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        var counter = new Counter();
+        var errorAggregator = new ErrorAggregator();
+
+        var fileName = @"D:\dev\tfs\Manfred\backend\src\ManfredBackend\App_Data\Logs\log-20251213_084749.txt";
+
+        new Pipeline()
+            .AddItem(new LogSource(fileName))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(counter)
+            .AddItem(errorAggregator)
+            .AddItem(new Filter<LogEntry>(e =>
+            {
+                if (e.Category == "SecurityQueue")
+                    return true;
+                return false;
+            }))
+            .AddItem(new Formatter<LogEntry>(entry =>
+            {
+                var t = entry.Time.ToUniversalTime();
+                return $"{t.Date:yyyy-MM-dd}\t{t.Hour}\t{t.Minute}\t{t:ss.fff}\t{entry.Duration.TotalSeconds,-8}\t{entry.Message}";
+            }))
+            //.AddItem(new ConsoleWriter())
+            .AddItem(new FileWriter($"{fileName}.filtered.log"))
+            .Run();
+
+        Console.WriteLine("===========================================================");
+        Console.WriteLine($"Entries:           {counter.Entries,8}");
+        Console.WriteLine($"NotParsed:         {counter.NotParsedEntries,8}");
+        Console.WriteLine("LEVELS");
+        Console.WriteLine($"  Informations:    {counter.Informations,8}");
+        Console.WriteLine($"  Warnings:        {counter.Warnings,8}");
+        Console.WriteLine($"  Errors:          {counter.Errors,8}");
+        Console.WriteLine("CATEGORIES");
+        foreach (var category in counter.Categories)
+            Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
+
+        Console.Write("Writing error-aggregation file... ");
+        errorAggregator.WriteToFile($"{fileName}.errors.log");
+        Console.WriteLine("Ok");
+
+        Console.Write("Writing rental-collection file... ");
+        Console.WriteLine("Ok");
+
+        stopwatch.Stop();
+        Console.WriteLine($"Processing time {stopwatch.Elapsed}.");
+
+        Console.WriteLine("Ok");
+
+    }
+
 }
 
 /// <summary>
