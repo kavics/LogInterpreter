@@ -96,17 +96,15 @@ Pre-built components available in the `DefaultImplementations` namespace:
 ### Creating a Pipeline
 
 ```csharp
-var pipeline = new Pipeline
-{
-    Input = new LogSource { /* configuration */ }
-        .Pipe(new TwoLineLogParser())
-        .Pipe(new Filter { /* filtering conditions */ })
-        .Pipe(new Transformer { /* transformations */ })
-        .Pipe(new Formatter { /* formatting */ })
-        .Pipe(new ConsoleWriter())
-};
+var pipeline = new Pipeline()
+    .AddItem(new LogSource { /* configuration */ })
+    .AddItem(new TwoLineLogParser())
+    .AddItem(new Filter { /* filtering conditions */ })
+    .AddItem(new Transformer { /* transformations */ })
+    .AddItem(new Formatter { /* formatting */ })
+    .AddItem(new ConsoleWriter());
 
-await pipeline.ExecuteAsync();
+pipeline.Run();
 ```
 
 ### Creating a Custom Pipeline Element
