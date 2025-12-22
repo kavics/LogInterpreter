@@ -1,4 +1,4 @@
-﻿namespace LogInterpreter.Abstractions.DefaultImplementations;
+﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 /// <summary>
 /// Reads log files from a specified directory or a single file and emits their full paths.

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace LogInterpreter.Abstractions.DefaultImplementations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class TwoLineLogReader : IPipelineItem<string, string[]>
 {

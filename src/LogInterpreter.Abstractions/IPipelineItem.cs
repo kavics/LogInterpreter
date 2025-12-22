@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace LogInterpreter.Abstractions;
+namespace Kavics.LogInterpreter.Abstractions;
 
 public interface IPipelineItem
 {

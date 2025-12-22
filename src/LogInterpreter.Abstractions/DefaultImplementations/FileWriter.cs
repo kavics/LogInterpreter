@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace LogInterpreter.Abstractions.DefaultImplementations
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations
 {
     public class FileWriter : IPipelineItem<string, string>
     {

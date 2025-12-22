@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace LogInterpreter.Abstractions.DefaultImplementations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class TwoLineLogFileReader : IPipelineItem<string, string[]>
 {

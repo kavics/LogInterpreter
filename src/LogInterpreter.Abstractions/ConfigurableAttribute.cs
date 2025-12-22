@@ -1,4 +1,4 @@
-﻿namespace LogInterpreter.Abstractions;
+﻿namespace Kavics.LogInterpreter.Abstractions;
 
 public enum ConfigurationType { Default, Path }
 

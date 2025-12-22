@@ -1,4 +1,4 @@
-﻿using LogInterpreter.Abstractions.DefaultImplementations;
+﻿using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 namespace LogInterpreter.CLI
 {

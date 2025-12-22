@@ -1,5 +1,5 @@
-﻿using LogInterpreter.Abstractions;
-using LogInterpreter.Abstractions.DefaultImplementations;
+﻿using Kavics.LogInterpreter.Abstractions;
+using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Text;

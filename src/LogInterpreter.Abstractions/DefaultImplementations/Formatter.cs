@@ -1,4 +1,4 @@
-﻿namespace LogInterpreter.Abstractions.DefaultImplementations;
+﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class Formatter<T> : IPipelineItem<T, string> where T : ILogEntry
 {

@@ -1,4 +1,4 @@
-﻿namespace LogInterpreter.Abstractions.DefaultImplementations;
+﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class Filter<T> : IPipelineItem<T, T> //where T : ILogEntry
 {
