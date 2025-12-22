@@ -511,7 +511,7 @@ internal static class TestsForDev
         var counter = new Counter();
         var errorAggregator = new ErrorAggregator();
 
-        var fileName = @"D:\dev\tfs\Manfred\backend\src\ManfredBackend\App_Data\Logs\log-20251213_084749.txt";
+        var fileName = @"D:\dev\tfs\Manfred\backend\src\ManfredBackend\App_Data\Logs\Test10";
 
         new Pipeline()
             .AddItem(new LogSource(fileName))
@@ -521,9 +521,14 @@ internal static class TestsForDev
             .AddItem(counter)
             .AddItem(errorAggregator)
             .AddItem(new Filter<LogEntry>(e =>
-            {
+            {// "Current request count" "Request limit reached"
                 if (e.Category == "SecurityQueue")
                     return true;
+                if (e.Category == "System")
+                {
+                    if (e.Message.StartsWith("RequestSupervisor:"))
+                        return true;
+                }
                 return false;
             }))
             .AddItem(new Formatter<LogEntry>(entry =>
@@ -532,10 +537,109 @@ internal static class TestsForDev
                 return $"{t.Date:yyyy-MM-dd}\t{t.Hour}\t{t.Minute}\t{t:ss.fff}\t{entry.Duration.TotalSeconds,-8}\t{entry.Message}";
             }))
             //.AddItem(new ConsoleWriter())
-            .AddItem(new FileWriter($"{fileName}.filtered.log"))
+            .AddItem(new FileWriter($"{fileName}\\data\\filtered.log"))
             .Run();
 
-        Console.WriteLine("===========================================================");
+        new Pipeline()
+            .AddItem(new LogSource(fileName))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(new Filter<LogEntry>(e =>
+            {
+                if (e.Category == "System")
+                {
+                    if (e.Message.StartsWith("RequestSupervisor: ThreadPool:"))
+                        return true;
+                }
+                return false;
+            }))
+            .AddItem(new Formatter<LogEntry>(entry =>
+            {
+                var t = entry.Time.ToUniversalTime();
+                return $"{t.Date:yyyy-MM-dd}\t{t.Hour}\t{t.Minute}\t{t:ss.fff}\t{entry.Message}";
+            }))
+            //.AddItem(new ConsoleWriter())
+            .AddItem(new FileWriter($"{fileName}\\data\\threads.log"))
+            .Run();
+
+        new Pipeline()
+            .AddItem(new LogSource(fileName))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(new Filter<LogEntry>(e =>
+            {
+                if (e.Category == "System")
+                {
+                    if (e.Message.StartsWith("RequestSupervisor: Request count for User_Registration:"))
+                        return true;
+                }
+                if(e.Message == "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms")
+                {
+                    // "RequestMethod":"POST","RequestPath":"/odata.svc/('Root')/Users/Registration"
+                    if (e.Properties.TryGetValue("RequestPath", out var path) &&
+                        path == "/odata.svc/('Root')/Users/Registration")
+                        return true;
+                }
+                return false;
+            }))
+            .AddItem(new Formatter<LogEntry>(entry =>
+            {
+                var t = entry.Time.ToUniversalTime();
+                var requestId = entry.Properties.ContainsKey("RequestId") ? entry.Properties["RequestId"] : "-------------:--------";
+                var elapsed = entry.Properties.ContainsKey("Elapsed") ? entry.Properties["Elapsed"] : "---.------";
+                return $"{t.Date:yyyy-MM-dd}\t{t.Hour}\t{t.Minute}\t{t:ss.fff}\t{requestId}\t{elapsed}\t{entry.Message}";
+            }))
+            //.AddItem(new ConsoleWriter())
+            .AddItem(new FileWriter($"{fileName}\\data\\registration-requests.log"))
+            .Run();
+
+        new Pipeline()
+            .AddItem(new LogSource(fileName))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(new Filter<LogEntry>(e =>
+            {
+                if (e.Category == "System")
+                {
+                    if (e.Message.StartsWith("RequestSupervisor: ThreadPool:"))
+                        return true;
+                }
+                return false;
+            }))
+            .AddItem(new Formatter<LogEntry>(entry =>
+            {
+                // Parse: "RequestSupervisor: ThreadPool: 26, 11, 163936 | 9, 3, 4, 0"
+                // Output: "26\t11\t9\t3\t4\t0\t163936"
+                var message = entry.Message;
+
+                // Extract the numbers part after "ThreadPool: "
+                var prefix = "RequestSupervisor: ThreadPool: ";
+                if (!message.StartsWith(prefix))
+                    return message;
+
+                var numbersPart = message.Substring(prefix.Length);
+
+                var numbers = numbersPart
+                    .Split(new[] { '|', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .ToList();
+
+                if (numbers.Count >= 3)
+                {
+                    var thirdElement = numbers[2];
+                    numbers.RemoveAt(2);
+                    numbers.Add(thirdElement);
+                }
+
+                return string.Join("\t", numbers);
+            }))
+            .AddItem(new FileWriter($"{fileName}\\data\\threads_table.log"))
+            .Run();
+
+        Console.WriteLine("====================================================");
         Console.WriteLine($"Entries:           {counter.Entries,8}");
         Console.WriteLine($"NotParsed:         {counter.NotParsedEntries,8}");
         Console.WriteLine("LEVELS");
@@ -547,10 +651,7 @@ internal static class TestsForDev
             Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
 
         Console.Write("Writing error-aggregation file... ");
-        errorAggregator.WriteToFile($"{fileName}.errors.log");
-        Console.WriteLine("Ok");
-
-        Console.Write("Writing rental-collection file... ");
+        errorAggregator.WriteToFile($"{fileName}\\data\\errors.log");
         Console.WriteLine("Ok");
 
         stopwatch.Stop();

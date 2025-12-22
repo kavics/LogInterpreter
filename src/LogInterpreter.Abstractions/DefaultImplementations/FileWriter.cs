@@ -22,7 +22,7 @@ namespace LogInterpreter.Abstractions.DefaultImplementations
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
 
-            using var fileStream = new System.IO.FileStream(FilePath, FileMode.OpenOrCreate, FileAccess.Write);
+            using var fileStream = new System.IO.FileStream(FilePath, FileMode.Create, FileAccess.Write);
             using var writer = new StreamWriter(fileStream, Encoding.UTF8);
             foreach (var line in Input)
             {
