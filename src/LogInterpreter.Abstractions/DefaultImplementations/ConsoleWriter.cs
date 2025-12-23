@@ -1,15 +1,16 @@
-﻿namespace LogInterpreter.Abstractions.DefaultImplementations
+﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+
+public class ConsoleWriter : IPipelineItem<string, string>
 {
-    public class ConsoleWriter : IPipelineItem<string, string>
+    public string Name => this.GetType().Name;
+
+    public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
+    public IEnumerator<string> GetEnumerator()
     {
-        public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
-        public IEnumerator<string> GetEnumerator()
+        foreach (var line in Input)
         {
-            foreach (var line in Input)
-            {
-                Console.WriteLine(line);
-                yield return line;
-            }
+            Console.WriteLine(line);
+            yield return line;
         }
     }
 }

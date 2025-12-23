@@ -1,8 +1,13 @@
 ﻿using System.Collections;
 
-namespace LogInterpreter.Abstractions;
+namespace Kavics.LogInterpreter.Abstractions;
 
-public interface IPipelineItem<TIn, out TOut> : IEnumerable<TOut>
+public interface IPipelineItem
+{
+    string Name { get; }
+}
+
+public interface IPipelineItem<TIn, out TOut> : IEnumerable<TOut>, IPipelineItem
 {
     IEnumerable<TIn> Input { get; set; }
     IEnumerator IEnumerable.GetEnumerator()

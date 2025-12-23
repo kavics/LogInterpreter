@@ -6,10 +6,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace LogInterpreter.Abstractions.DefaultImplementations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class OneLineLogFileReader : IPipelineItem<string, string>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<string> GetEnumerator()

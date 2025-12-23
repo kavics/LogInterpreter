@@ -1,9 +1,11 @@
 ﻿using System.Globalization;
 
-namespace LogInterpreter.Abstractions.DefaultImplementations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class TwoLineLogReader : IPipelineItem<string, string[]>
 {
+    public string Name => this.GetType().Name;
+
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<string[]> GetEnumerator()

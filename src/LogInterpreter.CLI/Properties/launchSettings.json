@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LogInterpreter.CLI": {
+      "commandName": "Project",
+      //"commandLineArgs": "command1 --arg11 cmd1arg1"
+      //"commandLineArgs": "command1 --arg21 456 --arg22 cmd2arg2"
+      //"commandLineArgs": "command2 --arg21 456 --arg22 cmd2arg2"
+      //"commandLineArgs": "command2 --arg21 cmd2arg2 --arg22 456",
+      "commandLineArgs": "Rewrite \"D:\\__temp\\logs\\manfredrepo-staging\\log-20250701_142118.txt\" \"D:\\__temp\\logs\\manfredrepo-staging\\log-20250701_142118-readable.txt\""
+    }
+  }
+}
