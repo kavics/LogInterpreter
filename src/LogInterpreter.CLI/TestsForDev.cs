@@ -355,7 +355,7 @@ internal static class TestsForDev
     internal static void CompactJsonParser_Manfred_Prod_FilesAndDates()
     {
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod"))
+            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all"))
             //.AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod", "log-20250625_124309.txt"))
             .AddItem(new ConsoleWriter())
             .AddItem(new FirstLineReader())
@@ -661,6 +661,90 @@ internal static class TestsForDev
 
     }
 
+    internal static void CompactJsonParser_Manfred_Prod_Analysis_2025_12_24()
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        var counter = new Counter();
+        var errorAggregator = new ErrorAggregator();
+        var rentalCollector = new ManfredRentalCollector();
+        var webRequestCollector = new ManfredWebRequestCollector();
+
+        new Pipeline()
+            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20250625_124309.txt"))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(counter)
+            .AddItem(webRequestCollector)
+            .AddItem(errorAggregator)
+            .AddItem(rentalCollector)
+            //.AddItem(new Filter<LogEntry>(e =>
+            //{
+            //    if (e.Message.StartsWith("Updating rental status"))
+            //        return true;
+            //    if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
+            //        return true;
+            //    if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
+            //        return true;
+            //    return false;
+            //}))
+            //.AddItem(new Formatter<LogEntry>(entry =>
+            //{
+            //    if (!entry.Properties.TryGetValue("RentalId", out var rental))
+            //        rental = "";
+            //    if (!entry.Properties.TryGetValue("UserEmail", out var user))
+            //        user = "unknown";
+            //    if (!entry.Properties.TryGetValue("Bicycle", out var bicycle))
+            //        user = "----";
+
+            //    var message = entry.Message
+            //        .Replace("Rental {RentalId} started for user {UserEmail}", "Rental start")
+            //        .Replace("Updating rental status: ", "")
+            //        .Replace("Updating rental status after wait for close: ", "");
+            //    return $"{entry.Time.ToUniversalTime():yyyy-MM-dd HH:mm:ss.fff} #{rental} &{bicycle} @{user,-32} {message}";
+            //}))
+            //.AddItem(new ConsoleWriter())
+            //.AddItem(new FileWriter(@"D:\__temp\logs\analízis\Manfred_2025_10_26\Rentals.txt"))
+            .Run();
+
+        Console.WriteLine("===========================================================");
+        Console.WriteLine($"Entries:           {counter.Entries,8}");
+        Console.WriteLine($"NotParsed:         {counter.NotParsedEntries,8}");
+        Console.WriteLine("LEVELS");
+        Console.WriteLine($"  Informations:    {counter.Informations,8}");
+        Console.WriteLine($"  Warnings:        {counter.Warnings,8}");
+        Console.WriteLine($"  Errors:          {counter.Errors,8}");
+        Console.WriteLine("CATEGORIES");
+        foreach (var category in counter.Categories)
+            Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
+
+        Console.WriteLine("WEB REQUESTS:");
+        Console.WriteLine($"  count:           {webRequestCollector.RequestCount,8}");
+        Console.WriteLine($"  long count:      {webRequestCollector.LongCount,8}");
+        Console.WriteLine($"  very long count: {webRequestCollector.VeryLongCount,8}");
+        Console.WriteLine($"  average time:       {webRequestCollector.AverageTime:F2} ms");
+        Console.WriteLine($"  longest time:       {webRequestCollector.LongestTimeSec:F2} sec");
+        Console.WriteLine($"  longest key:        {webRequestCollector.LongestRequestId:F2}");
+        Console.WriteLine($"  Status codes:");
+        foreach (var kvp in webRequestCollector.StatusCodes.OrderBy(kvp => kvp.Key))
+            Console.WriteLine($"    {kvp.Key}: {kvp.Value}");
+
+        Console.Write("Writing error-aggregation file... ");
+        errorAggregator.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_12_24\ERRORS.txt");
+        Console.WriteLine("Ok");
+
+        Console.Write("Writing rental-collection file... ");
+        rentalCollector.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_12_24\Rentals.txt");
+        Console.WriteLine("Ok");
+
+        stopwatch.Stop();
+        Console.WriteLine($"Processing time {stopwatch.Elapsed}.");
+
+        Console.WriteLine("Ok");
+
+    }
+
 }
 
 /// <summary>
@@ -890,6 +974,24 @@ internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
         foreach (var kvp in _started.Where(kvp => !_finished.Contains(kvp.Key)))
             yield return kvp;
     }
+
+    internal void WriteToFile(string v)
+    {
+        using var writer = new StreamWriter(v, Encoding.UTF8, new FileStreamOptions
+        {
+            Access = FileAccess.Write,
+            Mode = FileMode.OpenOrCreate
+        });
+        writer.WriteLine("Unfinished Rentals");
+        writer.WriteLine("------------------");
+        writer.WriteLine();
+        writer.WriteLine($"{"RentalId",-10} User");
+        writer.WriteLine($"{"--------",-10} --------------------");
+        foreach (var kvp in GetUnfinishedRentals())
+        {
+            writer.WriteLine($"{kvp.Key,10} {kvp.Value}");
+        }
+    }
 }
 
 internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>
@@ -899,6 +1001,7 @@ internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
     private Dictionary<string, (int Count, DateTime FirstTime, DateTime LastTime)> _requestEntries = new();
+    public Dictionary<string, int> StatusCodes = new();
     public int RequestCount { get; private set; }
     public double AverageTime { get; private set; }
     public int LongCount { get; private set; }
@@ -926,6 +1029,14 @@ internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>
                     LongestTimeSec = valueSec;
                     entry.Properties.TryGetValue("RequestId", out var requestId);
                     LongestRequestId = requestId ?? "unknown";
+                }
+
+                // Increment status code counter
+                if (entry.Properties.TryGetValue("StatusCode", out var statusCode))
+                {
+                    if (!StatusCodes.ContainsKey(statusCode))
+                        StatusCodes[statusCode] = 0;
+                    StatusCodes[statusCode]++;
                 }
 
                 RequestCount++;

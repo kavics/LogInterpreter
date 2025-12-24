@@ -7,8 +7,11 @@ namespace LogInterpreter.CLI
     {
         static void Main(string[] args)
         {
-            TestsForDev.CompactJsonParser_Manfred_SecurityQueueError();
-return;
+            //TestsForDev.CompactJsonParser_Manfred_Prod_FilesAndDates();
+            //TestsForDev.CompactJsonParser_Manfred_SecurityQueueError();
+            TestsForDev.CompactJsonParser_Manfred_Prod_Analysis_2025_12_24();
+            return;
+
             try
             {
                 var appArgs = ArgumentParser.Parse(args);
