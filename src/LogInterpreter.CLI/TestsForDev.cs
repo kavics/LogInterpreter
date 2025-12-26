@@ -659,6 +659,9 @@ internal static class TestsForDev
     internal static void CompactJsonParser_Manfred_Prod_Analysis_2025_12_24()
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var outputDir = @"D:\__temp\logs\analízis\Manfred_2025_12_24";
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
 
         var counter = new Counter();
         var errorAggregator = new ErrorAggregator();
@@ -703,39 +706,53 @@ internal static class TestsForDev
             //.AddItem(new FileWriter(@"D:\__temp\logs\analízis\Manfred_2025_10_26\Rentals.txt"))
             .Run();
 
-        Console.WriteLine("===========================================================");
-        Console.WriteLine($"Entries:           {counter.Entries,8}");
-        Console.WriteLine($"NotParsed:         {counter.NotParsedEntries,8}");
-        Console.WriteLine("LEVELS");
-        Console.WriteLine($"  Informations:    {counter.Informations,8}");
-        Console.WriteLine($"  Warnings:        {counter.Warnings,8}");
-        Console.WriteLine($"  Errors:          {counter.Errors,8}");
-        Console.WriteLine("CATEGORIES");
-        foreach (var category in counter.Categories)
-            Console.WriteLine($"  {category.Key,-16} {category.Value,8}");
+        stopwatch.Stop();
 
-        Console.WriteLine("WEB REQUESTS:");
-        Console.WriteLine($"  count:           {webRequestCollector.RequestCount,8}");
-        Console.WriteLine($"  long count:      {webRequestCollector.LongCount,8}");
-        Console.WriteLine($"  very long count: {webRequestCollector.VeryLongCount,8}");
-        Console.WriteLine($"  average time:       {webRequestCollector.AverageTime:F2} ms");
-        Console.WriteLine($"  longest time:       {webRequestCollector.LongestTimeSec:F2} sec");
-        Console.WriteLine($"  longest key:        {webRequestCollector.LongestRequestId:F2}");
-        Console.WriteLine($"  Status codes:");
+        // Prepare summary content
+        var summary = new System.Text.StringBuilder();
+        summary.AppendLine("===========================================================");
+        summary.AppendLine($"Entries:           {counter.Entries,8}");
+        summary.AppendLine($"NotParsed:         {counter.NotParsedEntries,8}");
+        summary.AppendLine("LEVELS");
+        summary.AppendLine($"  Informations:    {counter.Informations,8}");
+        summary.AppendLine($"  Warnings:        {counter.Warnings,8}");
+        summary.AppendLine($"  Errors:          {counter.Errors,8}");
+        summary.AppendLine("CATEGORIES");
+        foreach (var category in counter.Categories)
+            summary.AppendLine($"  {category.Key,-16} {category.Value,8}");
+
+        summary.AppendLine("WEB REQUESTS:");
+        summary.AppendLine($"  count:           {webRequestCollector.RequestCount,8}");
+        summary.AppendLine($"  long count:      {webRequestCollector.LongCount,8}");
+        summary.AppendLine($"  very long count: {webRequestCollector.VeryLongCount,8}");
+        summary.AppendLine($"  average time:       {webRequestCollector.AverageTime:F2} ms");
+        summary.AppendLine($"  longest time:       {webRequestCollector.LongestTimeSec:F2} sec");
+        summary.AppendLine($"  longest key:        {webRequestCollector.LongestRequestId}");
+        summary.AppendLine($"  Status codes:");
         foreach (var kvp in webRequestCollector.StatusCodes.OrderBy(kvp => kvp.Key))
-            Console.WriteLine($"    {kvp.Key}: {kvp.Value}");
+            summary.AppendLine($"    {kvp.Key}: {kvp.Value}");
+
+        summary.AppendLine($"Processing time {stopwatch.Elapsed}.");
+        summary.AppendLine("Ok");
+
+        // Write to console
+        Console.WriteLine(summary.ToString());
+
+        // Write to file
+        Console.Write("Writing analysis summary file... ");
+        File.WriteAllText(Path.Combine(outputDir, "Analysis-summary.txt"), summary.ToString());
+        Console.WriteLine("Ok");
 
         Console.Write("Writing error-aggregation file... ");
-        errorAggregator.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_12_24\ERRORS.txt");
+        errorAggregator.WriteToFile(Path.Combine(outputDir, "ERRORS.txt"));
         Console.WriteLine("Ok");
 
         Console.Write("Writing rental-collection file... ");
-        rentalCollector.WriteToFile(@"D:\__temp\logs\analízis\Manfred_2025_12_24\Rentals.txt");
+        rentalCollector.WriteToFile(Path.Combine(outputDir, "Rentals.txt"));
         Console.WriteLine("Ok");
 
-        stopwatch.Stop();
-        Console.WriteLine($"Processing time {stopwatch.Elapsed}.");
-
+        Console.Write("Writing webrequest statistics file... ");
+        webRequestCollector.WriteToFile(Path.Combine(outputDir, "WebRequests.txt"));
         Console.WriteLine("Ok");
 
     }
