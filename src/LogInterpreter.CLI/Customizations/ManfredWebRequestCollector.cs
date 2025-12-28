@@ -1,12 +1,22 @@
 using Kavics.LogInterpreter.Abstractions;
 using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+using Microsoft.VisualBasic;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogInterpreter.CLI.Customizations;
 
-internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>
+internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+
+    private string? _aggregationFileName;
+
+    public ManfredWebRequestCollector(string? aggregationFileName = null)
+    {
+        _aggregationFileName = aggregationFileName;
+    }
 
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
@@ -95,5 +105,35 @@ internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>
         {
             writer.WriteLine($"  {kvp.Value,8}  {kvp.Key}");
         }
+    }
+
+    public Task WriteAggregation(CancellationToken cancellationToken = default)
+    {
+        var summary = new System.Text.StringBuilder();
+        summary.AppendLine("WEBREQUEST SUMMARY");
+        summary.AppendLine("===========================================================");
+        summary.AppendLine("WEB REQUESTS:");
+        summary.AppendLine($"  count:           {RequestCount,8}");
+        summary.AppendLine($"  long count:      {LongCount,8}");
+        summary.AppendLine($"  very long count: {VeryLongCount,8}");
+        summary.AppendLine($"  average time:       {AverageTime:F2} ms");
+        summary.AppendLine($"  longest time:       {LongestTimeSec:F2} sec");
+        summary.AppendLine($"  longest key:        {LongestRequestId}");
+        summary.AppendLine($"  Status codes:");
+        foreach (var kvp in StatusCodes.OrderBy(kvp => kvp.Key))
+            summary.AppendLine($"    {kvp.Key}: {kvp.Value}");
+        summary.Append("===========================================================");
+
+        var console = Pipeline.GetConsole();
+        console.WriteLine(summary.ToString());
+
+        if (_aggregationFileName != null)
+        {
+            Console.Write("Writing webrequest statistics file... ");
+            WriteToFile(_aggregationFileName);
+            console.WriteLine("ok.");
+        }
+        console.WriteLine();
+        return Task.CompletedTask;
     }
 }

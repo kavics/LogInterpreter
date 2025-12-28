@@ -2,6 +2,9 @@
 
 public class Filter<T> : IPipelineItem<T, T> //where T : ILogEntry
 {
+    public Pipeline Pipeline { get; set; } = null!;
+    public string Name => this.GetType().Name;
+
     [Configurable]
     public Func<T, bool> FilterFunction { get; set; }
 
@@ -10,7 +13,6 @@ public class Filter<T> : IPipelineItem<T, T> //where T : ILogEntry
         this.FilterFunction = filter;
     }
 
-    public string Name => this.GetType().Name;
 
     public IEnumerable<T> Input { get; set; } = Array.Empty<T>();
 

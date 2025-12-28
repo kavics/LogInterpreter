@@ -4,6 +4,9 @@ namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class FileWriter : IPipelineItem<string, string>
 {
+    public Pipeline Pipeline { get; set; } = null!;
+    public string Name => this.GetType().Name;
+
     [Configurable(ConfigurationType.Path)]
     public string FilePath { get; set; }
 
@@ -12,7 +15,6 @@ public class FileWriter : IPipelineItem<string, string>
         FilePath = path;
     }
 
-    public string Name => this.GetType().Name;
 
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 

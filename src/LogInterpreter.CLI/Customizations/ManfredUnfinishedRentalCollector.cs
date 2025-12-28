@@ -1,4 +1,5 @@
 using Kavics.LogInterpreter.Abstractions;
+using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -6,6 +7,7 @@ namespace LogInterpreter.CLI.Customizations;
 
 internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();

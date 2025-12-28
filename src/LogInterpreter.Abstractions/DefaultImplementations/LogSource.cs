@@ -10,6 +10,7 @@
 ///   Only makes sense if <paramref name="path"/> points to a directory.</param>
 public class LogSource : IPipelineItem<int, string>
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 
     public IEnumerable<int> Input { get; set; } = Array.Empty<int>();

@@ -1,9 +1,13 @@
 using Kavics.LogInterpreter.Abstractions;
+using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 namespace LogInterpreter.CLI.Customizations;
 
 internal class FirstLineReader : IPipelineItem<string, string>
 {
+    public Pipeline Pipeline { get; set; } = null!;
+    public string Name => this.GetType().Name;
+
     [Configurable]
     public int? Count { get; set; }
 
@@ -11,8 +15,6 @@ internal class FirstLineReader : IPipelineItem<string, string>
     {
         Count = count;
     }
-
-    public string Name => this.GetType().Name;
 
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 

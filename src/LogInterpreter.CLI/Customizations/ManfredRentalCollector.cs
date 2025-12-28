@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LogInterpreter.CLI.Customizations;
 
-internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>
+internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     private class Rental
     {
@@ -16,7 +16,15 @@ internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>
         public List<string> Log { get; } = new List<string>();
     }
 
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+
+    private string? _aggregationFileName;
+
+    public ManfredRentalCollector(string? aggregationFileName = null)
+    {
+        _aggregationFileName = aggregationFileName;
+    }
 
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
@@ -86,6 +94,33 @@ internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>
             .Replace("Updating rental status after wait for open: ", "");
 
         return $"{entry.Time.ToUniversalTime():yyyy-MM-dd HH:mm:ss.fff}\t{message}".Trim();
+    }
+
+    public Task WriteAggregation(CancellationToken cancellationToken = default)
+    {
+        var rentalCount = _rentals.Count;
+        var unfinishedCount = _rentals.Values.Count(r => !r.Finished);
+        var problematicCount = _rentals.Values.Count(r => r.Problematic);
+
+        var summary = new System.Text.StringBuilder();
+        summary.AppendLine("RENTAL SUMMARY");
+        summary.AppendLine("===========================================================");
+        summary.AppendLine($"Total rentals:    {rentalCount,8}");
+        summary.AppendLine($"  Unfinished:       {unfinishedCount,8} ({(unfinishedCount * 100.0 / rentalCount):F2}%)");
+        summary.AppendLine($"  Problematic:      {problematicCount,8} ({(problematicCount * 100.0 / rentalCount):F2}%)");
+        summary.Append("===========================================================");
+
+        var console = Pipeline.GetConsole();
+        console.WriteLine(summary.ToString());
+
+        if (_aggregationFileName != null)
+        {
+            Console.Write("Writing rental details to file... ");
+            WriteToFile(_aggregationFileName);
+            console.WriteLine("ok.");
+        }
+        console.WriteLine();
+        return Task.CompletedTask;
     }
 
     public void WriteToFile(string filePath)

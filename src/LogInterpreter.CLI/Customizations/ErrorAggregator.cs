@@ -4,15 +4,22 @@ using System.Text;
 
 namespace LogInterpreter.CLI.Customizations;
 
-internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
+internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+
+    public ErrorAggregator(string? aggregationFileName = null)
+    {
+        _aggregationFileName = aggregationFileName;
+    }
 
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
     public Dictionary<string, List<DateTime>> Criticals = new();
     public Dictionary<string, List<DateTime>> Errors = new();
     public Dictionary<string, List<DateTime>> Warnings = new();
+    private string? _aggregationFileName;
 
     public IEnumerator<LogEntry> GetEnumerator()
     {
@@ -40,6 +47,24 @@ internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
         }
     }
 
+    public Task WriteAggregation(CancellationToken cancellationToken = default)
+    {
+        var console = Pipeline.GetConsole();
+        WriteAggregationSummary(console);
+
+        if (_aggregationFileName != null)
+        {
+            console.Write("Writing detailed error information to file...");
+            WriteToFile(_aggregationFileName);
+            console.WriteLine("ok.");
+        }
+        else
+        {
+            console.WriteLine("WARNING: No aggregation file name provided, writing detailed error information skipped.");
+        }
+        console.WriteLine();
+        return Task.CompletedTask;
+    }
     public void WriteToFile(string filePath, bool withTimes = false)
     {
         using var writer = new StreamWriter(filePath, Encoding.UTF8, new FileStreamOptions
@@ -55,6 +80,9 @@ internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
                          .OrderByDescending(x => x.Value.Count))
                 writer.WriteLine($"{item.Key} ({item.Value.Count} items)");
         }
+
+        WriteAggregationSummary(writer);
+        writer.WriteLine("========================================================================");
 
         writer.WriteLine("More than one items");
         writer.WriteLine("-------------------");
@@ -92,4 +120,19 @@ internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>
         writer.WriteLine("WARNINGS");
         PrintOne(Warnings);
     }
+    void WriteAggregationSummary(TextWriter writer)
+    {
+        // Get counts by level
+        var criticalCount = Criticals.Sum(x => x.Value.Count);
+        var errorCount = Errors.Sum(x => x.Value.Count);
+        var warningCount = Warnings.Sum(x => x.Value.Count);
+        // Write summary to console
+        writer.WriteLine("ERROR AGGREGATION SUMMARY");
+        writer.WriteLine("-------------------------");
+        writer.WriteLine($"CRITICAL ERRORS: {criticalCount}");
+        writer.WriteLine($"ERRORS:          {errorCount}");
+        writer.WriteLine($"WARNINGS:        {warningCount}");
+        writer.WriteLine("-------------------------");
+    }
+
 }

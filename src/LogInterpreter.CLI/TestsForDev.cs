@@ -10,7 +10,7 @@ internal static class TestsForDev
 {
     public static void TwoLineParser()
     {
-        var counter = new Counter();
+        var counter = new EntryCounter();
         var errorAggregator = new ErrorAggregator();
 
         new Pipeline()
@@ -44,7 +44,7 @@ internal static class TestsForDev
 
     internal static void TwoLineParserIoT()
     {
-        var counter = new Counter();
+        var counter = new EntryCounter();
         var errorAggregator = new ErrorAggregator();
 
         new Pipeline()
@@ -75,7 +75,7 @@ internal static class TestsForDev
 
     internal static void TwoLineParser_Manfred_Experimental()
     {
-        var counter = new Counter();
+        var counter = new EntryCounter();
         var errorAggregator = new ErrorAggregator();
 
         var pattern1 = @"Rental (\d+) started for user (\S+)";
@@ -364,7 +364,7 @@ internal static class TestsForDev
 
     internal static void CompactJsonParser_Manfred_LiveTest2025_07_12()
     {
-        var counter = new Counter();
+        var counter = new EntryCounter();
         var errorAggregator = new ErrorAggregator();
         var collector = new ManfredUnfinishedRentalCollector();
         var pattern2 = @"Rental (\d+) initiated for user (\S+)";
@@ -422,7 +422,7 @@ internal static class TestsForDev
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        var counter = new Counter();
+        var counter = new EntryCounter();
         var errorAggregator = new ErrorAggregator();
         var rentalCollector = new ManfredRentalCollector();
         var collector = new ManfredUnfinishedRentalCollector();
@@ -506,7 +506,7 @@ internal static class TestsForDev
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        var counter = new Counter();
+        var counter = new EntryCounter();
         var errorAggregator = new ErrorAggregator();
 
         var fileName = @"D:\dev\tfs\Manfred\backend\src\ManfredBackend\App_Data\Logs\Test10";
@@ -658,102 +658,20 @@ internal static class TestsForDev
 
     internal static void CompactJsonParser_Manfred_Prod_Analysis_2025_12_24()
     {
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         var outputDir = @"D:\__temp\logs\analízis\Manfred_2025_12_24";
         if (!Directory.Exists(outputDir))
             Directory.CreateDirectory(outputDir);
 
-        var counter = new Counter();
-        var errorAggregator = new ErrorAggregator();
-        var rentalCollector = new ManfredRentalCollector();
-        var webRequestCollector = new ManfredWebRequestCollector();
-
         new Pipeline()
             .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20250625_124309.txt"))
+            //.AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20251202_100942_030.txt"))
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
-            .AddItem(counter)
-            .AddItem(webRequestCollector)
-            .AddItem(errorAggregator)
-            .AddItem(rentalCollector)
-            //.AddItem(new Filter<LogEntry>(e =>
-            //{
-            //    if (e.Message.StartsWith("Updating rental status"))
-            //        return true;
-            //    if (e.Message.StartsWith("Rental {RentalId} started for user {UserEmail}"))
-            //        return true;
-            //    if (e.Message.StartsWith("Rental {RentalId} initiated for user {UserEmail}"))
-            //        return true;
-            //    return false;
-            //}))
-            //.AddItem(new Formatter<LogEntry>(entry =>
-            //{
-            //    if (!entry.Properties.TryGetValue("RentalId", out var rental))
-            //        rental = "";
-            //    if (!entry.Properties.TryGetValue("UserEmail", out var user))
-            //        user = "unknown";
-            //    if (!entry.Properties.TryGetValue("Bicycle", out var bicycle))
-            //        user = "----";
-
-            //    var message = entry.Message
-            //        .Replace("Rental {RentalId} started for user {UserEmail}", "Rental start")
-            //        .Replace("Updating rental status: ", "")
-            //        .Replace("Updating rental status after wait for close: ", "");
-            //    return $"{entry.Time.ToUniversalTime():yyyy-MM-dd HH:mm:ss.fff} #{rental} &{bicycle} @{user,-32} {message}";
-            //}))
-            //.AddItem(new ConsoleWriter())
-            //.AddItem(new FileWriter(@"D:\__temp\logs\analízis\Manfred_2025_10_26\Rentals.txt"))
+            .AddItem(new ManfredRentalCollector(Path.Combine(outputDir, "Rentals.txt")))
+            .AddItem(new ErrorAggregator(Path.Combine(outputDir, "ERRORS.txt")))
+            .AddItem(new ManfredWebRequestCollector(Path.Combine(outputDir, "WebRequests.txt")))
+            .AddItem(new EntryCounter(Path.Combine(outputDir, "Analysis-summary.txt")))
             .Run();
-
-        stopwatch.Stop();
-
-        // Prepare summary content
-        var summary = new System.Text.StringBuilder();
-        summary.AppendLine("===========================================================");
-        summary.AppendLine($"Entries:           {counter.Entries,8}");
-        summary.AppendLine($"NotParsed:         {counter.NotParsedEntries,8}");
-        summary.AppendLine("LEVELS");
-        summary.AppendLine($"  Informations:    {counter.Informations,8}");
-        summary.AppendLine($"  Warnings:        {counter.Warnings,8}");
-        summary.AppendLine($"  Errors:          {counter.Errors,8}");
-        summary.AppendLine("CATEGORIES");
-        foreach (var category in counter.Categories)
-            summary.AppendLine($"  {category.Key,-16} {category.Value,8}");
-
-        summary.AppendLine("WEB REQUESTS:");
-        summary.AppendLine($"  count:           {webRequestCollector.RequestCount,8}");
-        summary.AppendLine($"  long count:      {webRequestCollector.LongCount,8}");
-        summary.AppendLine($"  very long count: {webRequestCollector.VeryLongCount,8}");
-        summary.AppendLine($"  average time:       {webRequestCollector.AverageTime:F2} ms");
-        summary.AppendLine($"  longest time:       {webRequestCollector.LongestTimeSec:F2} sec");
-        summary.AppendLine($"  longest key:        {webRequestCollector.LongestRequestId}");
-        summary.AppendLine($"  Status codes:");
-        foreach (var kvp in webRequestCollector.StatusCodes.OrderBy(kvp => kvp.Key))
-            summary.AppendLine($"    {kvp.Key}: {kvp.Value}");
-
-        summary.AppendLine($"Processing time {stopwatch.Elapsed}.");
-        summary.AppendLine("Ok");
-
-        // Write to console
-        Console.WriteLine(summary.ToString());
-
-        // Write to file
-        Console.Write("Writing analysis summary file... ");
-        File.WriteAllText(Path.Combine(outputDir, "Analysis-summary.txt"), summary.ToString());
-        Console.WriteLine("Ok");
-
-        Console.Write("Writing error-aggregation file... ");
-        errorAggregator.WriteToFile(Path.Combine(outputDir, "ERRORS.txt"));
-        Console.WriteLine("Ok");
-
-        Console.Write("Writing rental-collection file... ");
-        rentalCollector.WriteToFile(Path.Combine(outputDir, "Rentals.txt"));
-        Console.WriteLine("Ok");
-
-        Console.Write("Writing webrequest statistics file... ");
-        webRequestCollector.WriteToFile(Path.Combine(outputDir, "WebRequests.txt"));
-        Console.WriteLine("Ok");
-
     }
 }
