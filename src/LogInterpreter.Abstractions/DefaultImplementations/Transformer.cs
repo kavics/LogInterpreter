@@ -2,6 +2,9 @@
 
 public class Transformer<Tin, Tout> : IPipelineItem<Tin, Tout>
 {
+    public Pipeline Pipeline { get; set; } = null!;
+    public string Name => this.GetType().Name;
+
     [Configurable]
     public Func<Tin, Tout> TransformerFunction { get; set; }
 
@@ -9,8 +12,6 @@ public class Transformer<Tin, Tout> : IPipelineItem<Tin, Tout>
     {
         TransformerFunction = transformer;
     }
-
-    public string Name => this.GetType().Name;
 
     public IEnumerable<Tin> Input { get; set; } = Array.Empty<Tin>();
     public IEnumerator<Tout> GetEnumerator()

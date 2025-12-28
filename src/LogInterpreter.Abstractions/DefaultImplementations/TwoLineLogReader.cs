@@ -4,6 +4,7 @@ namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class TwoLineLogReader : IPipelineItem<string, string[]>
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
@@ -16,6 +17,7 @@ public class TwoLineLogReader : IPipelineItem<string, string[]>
         var isOdataMiddlewareError = false;
         foreach (var line in Input)
         {
+            //UNDONE: REMOVE Special handling for ODataMiddleware errors that are multiline JSON objects
             if (line.StartsWith("{ SourceContext: \"SenseNet.OData.ODataMiddleware\","))
             {
                 isOdataMiddlewareError = true;

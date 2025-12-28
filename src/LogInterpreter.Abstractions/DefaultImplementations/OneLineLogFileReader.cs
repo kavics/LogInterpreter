@@ -10,6 +10,7 @@ namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class OneLineLogFileReader : IPipelineItem<string, string>
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
@@ -18,6 +19,10 @@ public class OneLineLogFileReader : IPipelineItem<string, string>
     {
         foreach (var path in Input)
         {
+            var fileInfo = new FileInfo(path);
+            Pipeline.AddToCounter<int>("TotalLogFiles", 1);
+            Pipeline.AddToCounter<long>("TotalLogFileSizeBytes", fileInfo.Length);
+
             using var textReader = new StreamReader(path);
             string? line;
             while ((line = textReader.ReadLine()) != null)

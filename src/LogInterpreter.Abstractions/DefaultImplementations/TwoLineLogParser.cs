@@ -4,6 +4,7 @@ namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class TwoLineLogParser : IPipelineItem<string[], LogEntry>
 {
+    public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 
     private LogEntry _notRecognized = new LogEntry { Message = "not recognized entry" };
