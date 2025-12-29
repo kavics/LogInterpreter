@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 public class OneLineLogFileReader : IPipelineItem<string, string>
 {

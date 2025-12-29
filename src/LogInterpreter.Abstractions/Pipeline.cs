@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+namespace Kavics.LogInterpreter.Abstractions;
 
 public class Pipeline
 {
@@ -28,7 +28,7 @@ public class Pipeline
 
         if (_endpoint is IEnumerable<TIn> inputItem)
         {
-            item.Input = (IEnumerable<TIn>)inputItem;
+            item.Input = inputItem;
             _endpoint = item;
             Items.Add(item);
             return this;

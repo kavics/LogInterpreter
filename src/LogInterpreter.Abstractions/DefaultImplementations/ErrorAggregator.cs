@@ -1,10 +1,8 @@
-using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using System.Text;
 
-namespace LogInterpreter.CLI.Customizations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
-internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
+public class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;

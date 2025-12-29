@@ -1,7 +1,6 @@
 ﻿using Kavics.LogInterpreter.Abstractions;
 using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using LogInterpreter.CLI.Customizations;
-using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 
 namespace LogInterpreter.CLI;

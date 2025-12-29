@@ -1,14 +1,9 @@
-using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Text;
 
-namespace LogInterpreter.CLI.Customizations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
-internal class EntryCounter : IPipelineItem<LogEntry, LogEntry>, IAggregation
+public class EntryCounter : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
-
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 

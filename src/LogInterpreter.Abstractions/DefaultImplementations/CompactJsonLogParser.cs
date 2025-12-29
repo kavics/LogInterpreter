@@ -1,6 +1,4 @@
-﻿
-using Newtonsoft.Json.Linq;
-using System.Globalization;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 

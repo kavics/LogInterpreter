@@ -1,5 +1,4 @@
 using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 namespace LogInterpreter.CLI.Customizations;
 

@@ -1,5 +1,4 @@
 using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using System.Text;
 using System.Text.RegularExpressions;
 
