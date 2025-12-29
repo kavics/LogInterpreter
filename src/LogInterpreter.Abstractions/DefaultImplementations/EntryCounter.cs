@@ -6,13 +6,10 @@ public class EntryCounter : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+    public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
-    private string? _aggregationFileName;
-
-    public EntryCounter(string? aggregationFileName = null)
-    {
-        _aggregationFileName = aggregationFileName;
-    }
+    [Configurable(ConfigurationType.Path)]
+    public string? AggregationFileName { get; set; }
 
     public int Entries { get; private set; }
     public int NotParsedEntries { get; private set; }
@@ -21,7 +18,6 @@ public class EntryCounter : IPipelineItem<LogEntry, LogEntry>, IAggregation
     public int Errors { get; private set; }
     public Dictionary<string, int> Categories { get; } = new Dictionary<string, int>();
 
-    public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
     public DateTime FirstEntryTime { get; private set; } = DateTime.MinValue;
     public DateTime LastEntryTime { get; private set; } = DateTime.MinValue;
@@ -93,9 +89,9 @@ public class EntryCounter : IPipelineItem<LogEntry, LogEntry>, IAggregation
         var console = Pipeline.GetConsole();
         console.WriteLine(summary.ToString());
 
-        if (_aggregationFileName != null)
+        if (AggregationFileName != null)
         {
-            using var writer = new StreamWriter(_aggregationFileName, Encoding.UTF8, new FileStreamOptions
+            using var writer = new StreamWriter(AggregationFileName, Encoding.UTF8, new FileStreamOptions
             {
                 Access = FileAccess.Write,
                 Mode = FileMode.OpenOrCreate

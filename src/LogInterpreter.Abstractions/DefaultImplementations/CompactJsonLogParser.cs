@@ -6,7 +6,6 @@ public class CompactJsonLogParser : IPipelineItem<string, LogEntry>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<LogEntry> GetEnumerator()

@@ -4,19 +4,14 @@ public class Transformer<Tin, Tout> : IPipelineItem<Tin, Tout>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+    public IEnumerable<Tin> Input { get; set; } = Array.Empty<Tin>();
 
     [Configurable]
-    public Func<Tin, Tout> TransformerFunction { get; set; }
+    public Func<Tin, Tout> Function { get; set; } = _ => default!;
 
-    public Transformer(Func<Tin, Tout> transformer)
-    {
-        TransformerFunction = transformer;
-    }
-
-    public IEnumerable<Tin> Input { get; set; } = Array.Empty<Tin>();
     public IEnumerator<Tout> GetEnumerator()
     {
         foreach (var entry in Input)
-            yield return TransformerFunction(entry);
+            yield return Function(entry);
     }
 }

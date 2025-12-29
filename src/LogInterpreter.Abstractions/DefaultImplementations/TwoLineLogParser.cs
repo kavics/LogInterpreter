@@ -6,6 +6,7 @@ public class TwoLineLogParser : IPipelineItem<string[], LogEntry>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+    public IEnumerable<string[]> Input { get; set; } = new List<string[]>();
 
     private LogEntry _notRecognized = new LogEntry { Message = "not recognized entry" };
     private LogEntry _notRecognizedDate = new LogEntry { Message = "not recognized date" };
@@ -226,7 +227,6 @@ SenseNet.OData.ODataException: Unexpected character encountered while parsing va
         }
     }
 
-    public IEnumerable<string[]> Input { get; set; } = new List<string[]>();
 
     public IEnumerator<LogEntry> GetEnumerator()
     {

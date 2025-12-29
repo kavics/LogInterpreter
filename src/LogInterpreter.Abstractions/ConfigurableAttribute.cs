@@ -2,7 +2,7 @@
 
 public enum ConfigurationType { Default, Path }
 
-[AttributeUsage(AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 public class ConfigurableAttribute : Attribute
 {
     public ConfigurationType Type { get; }

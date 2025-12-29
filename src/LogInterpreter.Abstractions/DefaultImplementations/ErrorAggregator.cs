@@ -6,18 +6,14 @@ public class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
-    public ErrorAggregator(string? aggregationFileName = null)
-    {
-        _aggregationFileName = aggregationFileName;
-    }
-
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
+
+    [Configurable(ConfigurationType.Path)]
+    public string? AggregationFileName { get; set; }
 
     public Dictionary<string, List<DateTime>> Criticals = new();
     public Dictionary<string, List<DateTime>> Errors = new();
     public Dictionary<string, List<DateTime>> Warnings = new();
-    private string? _aggregationFileName;
 
     public IEnumerator<LogEntry> GetEnumerator()
     {
@@ -50,10 +46,10 @@ public class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
         var console = Pipeline.GetConsole();
         WriteAggregationSummary(console);
 
-        if (_aggregationFileName != null)
+        if (AggregationFileName != null)
         {
             console.Write("Writing detailed error information to file...");
-            WriteToFile(_aggregationFileName);
+            WriteToFile(AggregationFileName);
             console.WriteLine("ok.");
         }
         else
