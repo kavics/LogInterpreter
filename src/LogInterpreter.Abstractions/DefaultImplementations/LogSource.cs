@@ -1,4 +1,6 @@
-﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+﻿using System.ComponentModel;
+
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 /// <summary>
 /// Reads log files from a specified directory or a single file and emits their full paths.
@@ -8,6 +10,7 @@
 /// <param name="firstFileName">Optional. Skips files before the given name.
 ///   The order depends on the operating system.
 ///   Only makes sense if <paramref name="path"/> points to a directory.</param>
+[Description("Reads log files from a specified directory or a single file and emits their full paths.")]
 public class LogSource : IPipelineItem<int, string>
 {
     public Pipeline Pipeline { get; set; } = null!;
@@ -15,14 +18,11 @@ public class LogSource : IPipelineItem<int, string>
     public IEnumerable<int> Input { get; set; } = Array.Empty<int>();
 
     [Configurable(ConfigurationType.Path)]
+    [Description("The full path to the log directory or file.")]
     public string LogPath { get; set; }
     [Configurable(ConfigurationType.Path)]
+    [Description("Optional. If specified, files before this name will be skipped when reading from a directory.")]
     public string? FirstFileName { get; set; }
-    public LogSource(string path, string? firstFileName = null)
-    {
-        LogPath = path;
-        FirstFileName = firstFileName;
-    }
 
     public IEnumerator<string> GetEnumerator()
     {

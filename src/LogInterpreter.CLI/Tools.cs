@@ -8,7 +8,7 @@ namespace LogInterpreter.CLI
         public void Rewrite(string source, string target)
         {
             new Pipeline()
-                .AddItem(new LogSource(source))
+                .AddItem(new LogSource { LogPath = source })
                 .AddItem(new OneLineLogFileReader())
                 .AddItem(new CompactJsonLogParser())
                 .AddItem(new Formatter<LogEntry>

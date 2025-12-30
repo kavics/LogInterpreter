@@ -13,7 +13,7 @@ internal static class TestsForDev
         var errorAggregator = new ErrorAggregator();
 
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-test"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\manfredrepo-test" })
             .AddItem(new TwoLineLogFileReader())
             .AddItem(new TwoLineLogParser())
             .AddItem(counter)
@@ -50,7 +50,7 @@ internal static class TestsForDev
         var errorAggregator = new ErrorAggregator();
 
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\analízis\log-20250613_091610.txt"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\analízis\log-20250613_091610.txt" })
             .AddItem(new TwoLineLogFileReader())
             .AddItem(new TwoLineLogParser())
             .AddItem(counter)
@@ -88,7 +88,7 @@ internal static class TestsForDev
         var flespiCommandPattern = @"^\[IoT drv (\d+)\]\s*POST https://flespi\.io/gw/devices/(\d+)/commands-queue\s*";
         var flespiCommandResponsePattern = @"^\[IoT drv (\d+)\]\s*response: \{.*\}\s*$";
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\analízis\test-20250618_142218.txt"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\analízis\test-20250618_142218.txt" })
             .AddItem(new TwoLineLogFileReader())
             .AddItem(new TwoLineLogParser())
             .AddItem(counter)
@@ -179,7 +179,7 @@ internal static class TestsForDev
         var flespiCommandPattern = @"^\[IoT drv (\d+)\]\s*POST https://flespi\.io/gw/devices/(\d+)/commands-queue\s*";
         var flespiCommandResponsePattern = @"^\[IoT drv (\d+)\]\s*response: \{.*\}\s*$";
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\analízis\test-20250618_142218.txt"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\analízis\test-20250618_142218.txt" })
             .AddItem(new TwoLineLogFileReader())
             .AddItem(new TwoLineLogParser())
             .AddItem(new Filter<LogEntry>{
@@ -286,7 +286,7 @@ internal static class TestsForDev
         var flespiCommandPattern = @"^\[IoT drv (\d+)\]\s*POST https://flespi\.io/gw/devices/(\d+)/commands-queue\s*";
         var flespiCommandResponsePattern = @"^\[IoT drv (\d+)\]\s*response: \{.*\}\s*$";
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\analízis\log-local-compactjson-20250620_163228.txt"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\analízis\log-local-compactjson-20250620_163228.txt" })
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
             .AddItem(new Filter<LogEntry> {
@@ -390,7 +390,7 @@ internal static class TestsForDev
     internal static void CompactJsonParser_Manfred_Prod_FilesAndDates()
     {
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\manfredrepo-prod-all" })
             //.AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod", "log-20250625_124309.txt"))
             .AddItem(new ConsoleWriter())
             .AddItem(new FirstLineReader())
@@ -410,7 +410,7 @@ internal static class TestsForDev
         var pattern2 = @"Rental (\d+) initiated for user (\S+)";
 
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod\log-20250710_145840.txt"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\manfredrepo-prod\log-20250710_145840.txt" })
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
             .AddItem(counter)
@@ -476,7 +476,7 @@ internal static class TestsForDev
         var pattern2 = @"Rental (\d+) initiated for user (\S+)";
 
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20250625_124309.txt"))
+            .AddItem(new LogSource{ LogPath = @"D:\__temp\logs\manfredrepo-prod-all", FirstFileName = @"log-20250625_124309.txt" })
 //            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20251103_034508.txt"))
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
@@ -558,7 +558,7 @@ internal static class TestsForDev
         var fileName = @"D:\dev\tfs\Manfred\backend\src\ManfredBackend\App_Data\Logs\Test10";
 
         new Pipeline()
-            .AddItem(new LogSource(fileName))
+            .AddItem(new LogSource{ LogPath = fileName })
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
@@ -590,7 +590,7 @@ internal static class TestsForDev
             .Run();
 
         new Pipeline()
-            .AddItem(new LogSource(fileName))
+            .AddItem(new LogSource{ LogPath = fileName })
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
@@ -618,7 +618,7 @@ internal static class TestsForDev
             .Run();
 
         new Pipeline()
-            .AddItem(new LogSource(fileName))
+            .AddItem(new LogSource{ LogPath = fileName })
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
@@ -655,7 +655,7 @@ internal static class TestsForDev
             .Run();
 
         new Pipeline()
-            .AddItem(new LogSource(fileName))
+            .AddItem(new LogSource{ LogPath = fileName })
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
@@ -733,15 +733,48 @@ internal static class TestsForDev
             Directory.CreateDirectory(outputDir);
 
         new Pipeline()
-            .AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20250625_124309.txt"))
+            .AddItem(new LogSource
+            {
+                LogPath = @"D:\__temp\logs\manfredrepo-prod-all",
+                FirstFileName = @"log-20250625_124309.txt"
+            })
             //.AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20251202_100942_030.txt"))
             .AddItem(new ConsoleWriter())
             .AddItem(new OneLineLogFileReader())
             .AddItem(new CompactJsonLogParser())
-            .AddItem(new ManfredRentalCollector(Path.Combine(outputDir, "Rentals.txt")))
-            .AddItem(new ErrorAggregator{ AggregationFileName = Path.Combine(outputDir, "ERRORS.txt") })
-            .AddItem(new ManfredWebRequestCollector(Path.Combine(outputDir, "WebRequests.txt")))
-            .AddItem(new EntryCounter{ AggregationFileName = Path.Combine(outputDir, "Analysis-summary.txt") })
+            .AddItem(new ManfredRentalCollector { AggregationFileName = Path.Combine(outputDir, "Rentals.txt")})
+            .AddItem(new ErrorAggregator { AggregationFileName = Path.Combine(outputDir, "ERRORS.txt") })
+            .AddItem(new ManfredWebRequestCollector { AggregationFileName = Path.Combine(outputDir, "WebRequests.txt") })
+            .AddItem(new EntryCounter { AggregationFileName = Path.Combine(outputDir, "Analysis-summary.txt") })
             .Run();
+    }
+
+    internal static void ParsePipeline()
+    {
+        var outputDir = @"D:\__temp\logs\analízis\Manfred_2025_12_24";
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        var pipeline = new Pipeline()
+            .AddItem(new LogSource
+            {
+                LogPath = @"D:\__temp\logs\manfredrepo-prod-all",
+                FirstFileName = @"log-20250625_124309.txt"
+            })
+            //.AddItem(new LogSource(@"D:\__temp\logs\manfredrepo-prod-all", @"log-20251202_100942_030.txt"))
+            .AddItem(new ConsoleWriter())
+            .AddItem(new OneLineLogFileReader())
+            .AddItem(new CompactJsonLogParser())
+            .AddItem(new ManfredRentalCollector { AggregationFileName = Path.Combine(outputDir, "Rentals.txt") })
+            .AddItem(new ErrorAggregator { AggregationFileName = Path.Combine(outputDir, "ERRORS.txt") })
+            .AddItem(new ManfredWebRequestCollector { AggregationFileName = Path.Combine(outputDir, "WebRequests.txt") })
+            .AddItem(new EntryCounter { AggregationFileName = Path.Combine(outputDir, "Analysis-summary.txt") })
+            ;
+
+        var definition = pipeline.ToString();
+
+        var parsed = Pipeline
+            .Parse(definition)
+            .ToString();
     }
 }

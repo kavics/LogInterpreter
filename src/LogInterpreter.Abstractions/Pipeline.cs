@@ -77,4 +77,47 @@ public class Pipeline
             Counters[key] = value;
         }
     }
+
+    /* ================================================================================== */
+
+    public static readonly List<PipelineItemDescriptor> AvailableItems = new PipelineItemScanner().Discover();
+
+    public static Pipeline Parse(string definition) => new PipelineParser().Parse(definition);
+
+    public override string ToString()
+    {
+        if (Items.Count == 0)
+            return "Empty pipeline";
+
+        var lines = new List<string>();
+        
+        foreach (var item in Items)
+        {
+            var itemType = item.GetType();
+            var descriptor = AvailableItems.FirstOrDefault(d => d.Type == itemType);
+            
+            if (descriptor == null)
+            {
+                lines.Add(itemType.Name);
+                continue;
+            }
+
+            lines.Add(descriptor.Name);
+            
+            foreach (var config in descriptor.Configurations)
+            {
+                var property = itemType.GetProperty(config.Name);
+                if (property != null)
+                {
+                    var value = property.GetValue(item);
+                    if (value != null)
+                    {
+                        lines.Add($"    {config.Name}={value}");
+                    }
+                }
+            }
+        }
+
+        return string.Join(Environment.NewLine, lines);
+    }
 }
