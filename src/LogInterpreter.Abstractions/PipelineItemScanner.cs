@@ -22,10 +22,14 @@ internal class PipelineItemScanner
                 {
                     var descriptionAttribute = type.GetCustomAttribute<DescriptionAttribute>();
                     
+                    var (inputType, outputType) = GetPipelineItemTypes(type);
+                    
                     var descriptor = new PipelineItemDescriptor
                     {
                         Type = type,
                         Name = type.Name,
+                        Input = inputType,
+                        Output = outputType,
                         Description = descriptionAttribute?.Description ?? string.Empty,
                         Configurations = GetConfigurableProperties(type)
                     };
@@ -41,6 +45,21 @@ internal class PipelineItemScanner
         }
 
         return descriptors;
+    }
+
+    private static (Type? Input, Type? Output) GetPipelineItemTypes(Type type)
+    {
+        var pipelineInterface = type.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && 
+                                i.GetGenericTypeDefinition() == typeof(IPipelineItem<,>));
+
+        if (pipelineInterface != null)
+        {
+            var genericArguments = pipelineInterface.GetGenericArguments();
+            return (genericArguments[0], genericArguments[1]);
+        }
+
+        return (null, null);
     }
 
     private static List<PipelineItemConfigurationDescriptor> GetConfigurableProperties(Type type)
