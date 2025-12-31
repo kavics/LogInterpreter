@@ -34,7 +34,17 @@ public class Pipeline
             return this;
         }
 
-        return this;
+        var endpointType = _endpoint.GetType();
+        var endpointOutputType = endpointType.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IPipelineItem<,>))
+            ?.GetGenericArguments()[1];
+
+        throw new PipelineItemMismatchException(
+            $"Pipeline item type mismatch: " +
+            $"Endpoint type: '{endpointType.Name}', " +
+            $"Endpoint output type: '{endpointOutputType?.Name ?? "Unknown"}', " +
+            $"Incoming item type: '{item.GetType().Name}', " +
+            $"Incoming item input type: '{typeof(TIn).Name}'.");
     }
 
     public TextWriter GetConsole()
@@ -61,7 +71,6 @@ public class Pipeline
         {
             aggregation.WriteAggregation().GetAwaiter().GetResult();
         }
-
     }
 
     public Dictionary<string, object> Counters = new();
@@ -90,12 +99,12 @@ public class Pipeline
             return "Empty pipeline";
 
         var lines = new List<string>();
-        
+
         foreach (var item in Items)
         {
             var itemType = item.GetType();
             var descriptor = AvailableItems.FirstOrDefault(d => d.Type == itemType);
-            
+
             if (descriptor == null)
             {
                 lines.Add(itemType.Name);
@@ -103,7 +112,7 @@ public class Pipeline
             }
 
             lines.Add(descriptor.Name);
-            
+
             foreach (var config in descriptor.Configurations)
             {
                 var property = itemType.GetProperty(config.Name);
