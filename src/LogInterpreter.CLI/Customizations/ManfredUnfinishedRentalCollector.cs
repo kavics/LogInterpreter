@@ -1,10 +1,14 @@
+using System.ComponentModel;
 using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LogInterpreter.CLI.Customizations;
 
+/// <summary>
+/// Tracks unfinished rentals in Manfred application logs.
+/// </summary>
+[Description("Tracks unfinished rentals in Manfred application logs.")]
 internal class ManfredUnfinishedRentalCollector : IPipelineItem<string, string>
 {
     public Pipeline Pipeline { get; set; } = null!;

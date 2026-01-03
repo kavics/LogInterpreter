@@ -1,7 +1,4 @@
-﻿using System;
-using LogInterpreter.CLI;
-
-namespace LogInterpreter.CLI
+﻿namespace LogInterpreter.CLI
 {
     class Program
     {
@@ -9,7 +6,8 @@ namespace LogInterpreter.CLI
         {
             //TestsForDev.CompactJsonParser_Manfred_Prod_FilesAndDates();
             //TestsForDev.CompactJsonParser_Manfred_SecurityQueueError();
-            TestsForDev.CompactJsonParser_Manfred_Prod_Analysis_2025_12_24();
+            //TestsForDev.CompactJsonParser_Manfred_Prod_Analysis_2025_12_24();
+            TestsForDev.ParsePipeline();
             return;
 
             try

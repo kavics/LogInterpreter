@@ -1,14 +1,22 @@
+using System.ComponentModel;
 using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
 namespace LogInterpreter.CLI.Customizations;
 
+/// <summary>
+/// Reads the first N lines from each file in the pipeline.
+/// </summary>
+[Description("Reads the first N lines from each file in the pipeline.")]
 internal class FirstLineReader : IPipelineItem<string, string>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
 
+    /// <summary>
+    /// Gets or sets the number of lines to read from each file. Defaults to 1 if not specified.
+    /// </summary>
     [Configurable]
+    [Description("Number of lines to read from each file. Defaults to 1 if not specified.")]
     public int? Count { get; set; }
 
     public FirstLineReader(int? count = null)

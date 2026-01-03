@@ -1,11 +1,18 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
+using Newtonsoft.Json.Linq;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
+/// <summary>
+/// Parses two-line formatted log entries (header + JSON) into structured LogEntry objects.
+/// </summary>
+[Description("Parses two-line formatted log entries (header + JSON) into structured LogEntry objects.")]
 public class TwoLineLogParser : IPipelineItem<string[], LogEntry>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
+    public IEnumerable<string[]> Input { get; set; } = new List<string[]>();
 
     private LogEntry _notRecognized = new LogEntry { Message = "not recognized entry" };
     private LogEntry _notRecognizedDate = new LogEntry { Message = "not recognized date" };
@@ -226,7 +233,6 @@ SenseNet.OData.ODataException: Unexpected character encountered while parsing va
         }
     }
 
-    public IEnumerable<string[]> Input { get; set; } = new List<string[]>();
 
     public IEnumerator<LogEntry> GetEnumerator()
     {
@@ -247,7 +253,7 @@ public static class LightweightJsonParser
         input = input.Trim();
 
         if (input.StartsWith("{".AsSpan())) input = input.Slice(1);
-        if (input.EndsWith("{".AsSpan())) input = input.Slice(0, input.Length - 1);
+        if (input.EndsWith("}".AsSpan())) input = input.Slice(0, input.Length - 1);
 
         int pos = 0;
 
@@ -260,18 +266,23 @@ public static class LightweightJsonParser
             ReadOnlySpan<char> keySpan = input.Slice(pos, colonIndex).Trim();
             pos += colonIndex + 1;
 
-            // Érték olvasása a következő ','-ig vagy a végéig
-            int commaIndex = input.Slice(pos).IndexOf(',');
+            // Skip whitespace after colon
+            while (pos < input.Length && char.IsWhiteSpace(input[pos]))
+                pos++;
+
+            // Érték olvasása, figyelembe véve az idézőjeleket
             ReadOnlySpan<char> valueSpan;
-            if (commaIndex == -1)
+            int valueEnd = FindValueEnd(input, pos);
+            
+            if (valueEnd == -1)
             {
                 valueSpan = input.Slice(pos).Trim();
                 pos = input.Length;
             }
             else
             {
-                valueSpan = input.Slice(pos, commaIndex).Trim();
-                pos += commaIndex + 1;
+                valueSpan = input.Slice(pos, valueEnd - pos).Trim();
+                pos = valueEnd + 1; // Skip the comma
             }
 
             // Idézőjelek eltávolítása kulcsról és értékről, ha vannak
@@ -282,6 +293,43 @@ public static class LightweightJsonParser
         }
 
         return result;
+    }
+
+    private static int FindValueEnd(ReadOnlySpan<char> input, int startPos)
+    {
+        bool inQuotes = false;
+        bool escapeNext = false;
+
+        for (int i = startPos; i < input.Length; i++)
+        {
+            char c = input[i];
+
+            if (escapeNext)
+            {
+                escapeNext = false;
+                continue;
+            }
+
+            if (c == '\\')
+            {
+                escapeNext = true;
+                continue;
+            }
+
+            if (c == '"')
+            {
+                inQuotes = !inQuotes;
+                continue;
+            }
+
+            // Vessző csak akkor jelent field separator-t, ha nem vagyunk idézőjeleken belül
+            if (c == ',' && !inQuotes)
+            {
+                return i;
+            }
+        }
+
+        return -1; // Nincs több vessző, ez az utolsó érték
     }
 
     private static string RemoveSurroundingQuotes(ReadOnlySpan<char> span)

@@ -1,25 +1,28 @@
-using Kavics.LogInterpreter.Abstractions;
-using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+using System.ComponentModel;
 using System.Text;
 
-namespace LogInterpreter.CLI.Customizations;
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
-internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
+/// <summary>
+/// Collects and aggregates error, warning, and critical log entries.
+/// </summary>
+[Description("Collects and aggregates error, warning, and critical log entries.")]
+public class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
-    public ErrorAggregator(string? aggregationFileName = null)
-    {
-        _aggregationFileName = aggregationFileName;
-    }
-
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
+
+    /// <summary>
+    /// Gets or sets the file path to write error aggregation results to.
+    /// </summary>
+    [Configurable(ConfigurationType.Path)]
+    [Description("Gets or sets the file path to write error aggregation results to.")]
+    public string? AggregationFileName { get; set; }
 
     public Dictionary<string, List<DateTime>> Criticals = new();
     public Dictionary<string, List<DateTime>> Errors = new();
     public Dictionary<string, List<DateTime>> Warnings = new();
-    private string? _aggregationFileName;
 
     public IEnumerator<LogEntry> GetEnumerator()
     {
@@ -52,10 +55,10 @@ internal class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
         var console = Pipeline.GetConsole();
         WriteAggregationSummary(console);
 
-        if (_aggregationFileName != null)
+        if (AggregationFileName != null)
         {
             console.Write("Writing detailed error information to file...");
-            WriteToFile(_aggregationFileName);
+            WriteToFile(AggregationFileName);
             console.WriteLine("ok.");
         }
         else

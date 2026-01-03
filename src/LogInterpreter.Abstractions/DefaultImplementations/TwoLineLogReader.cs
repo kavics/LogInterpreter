@@ -1,12 +1,16 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
+/// <summary>
+/// Reads log files where each entry consists of two lines: header and JSON properties.
+/// </summary>
+[Description("Reads log files where each entry consists of two lines: header and JSON properties.")]
 public class TwoLineLogReader : IPipelineItem<string, string[]>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<string[]> GetEnumerator()

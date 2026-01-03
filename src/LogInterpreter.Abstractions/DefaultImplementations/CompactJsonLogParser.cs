@@ -1,14 +1,16 @@
-﻿
+﻿using System.ComponentModel;
 using Newtonsoft.Json.Linq;
-using System.Globalization;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
+/// <summary>
+/// Parses log entries from compact JSON format (one JSON object per line).
+/// </summary>
+[Description("Parses log entries from compact JSON format (one JSON object per line).")]
 public class CompactJsonLogParser : IPipelineItem<string, LogEntry>
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
     public IEnumerable<string> Input { get; set; } = Array.Empty<string>();
 
     public IEnumerator<LogEntry> GetEnumerator()

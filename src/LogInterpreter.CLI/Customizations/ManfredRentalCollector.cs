@@ -1,9 +1,14 @@
+using System.ComponentModel;
 using Kavics.LogInterpreter.Abstractions;
 using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using System.Text;
 
 namespace LogInterpreter.CLI.Customizations;
 
+/// <summary>
+/// Collects and aggregates rental information from Manfred application logs.
+/// </summary>
+[Description("Collects and aggregates rental information from Manfred application logs.")]
 internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     private class Rental
@@ -18,15 +23,14 @@ internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>, IAggr
 
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
-    private string? _aggregationFileName;
-
-    public ManfredRentalCollector(string? aggregationFileName = null)
-    {
-        _aggregationFileName = aggregationFileName;
-    }
-
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
+
+    /// <summary>
+    /// Gets or sets the file path to write rental aggregation results to.
+    /// </summary>
+    [Configurable(ConfigurationType.Path)]
+    [Description("Gets or sets the file path to write rental aggregation results to.")]
+    public string? AggregationFileName { get; set; }
 
     private Dictionary<string, Rental> _rentals = new();
 
@@ -113,10 +117,10 @@ internal class ManfredRentalCollector : IPipelineItem<LogEntry, LogEntry>, IAggr
         var console = Pipeline.GetConsole();
         console.WriteLine(summary.ToString());
 
-        if (_aggregationFileName != null)
+        if (AggregationFileName != null)
         {
             Console.Write("Writing rental details to file... ");
-            WriteToFile(_aggregationFileName);
+            WriteToFile(AggregationFileName);
             console.WriteLine("ok.");
         }
         console.WriteLine();

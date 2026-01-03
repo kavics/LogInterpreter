@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Kavics.LogInterpreter.Abstractions;
 using Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 using Microsoft.VisualBasic;
@@ -6,19 +7,22 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogInterpreter.CLI.Customizations;
 
+/// <summary>
+/// Collects and analyzes web request statistics from Manfred application logs.
+/// </summary>
+[Description("Collects and analyzes web request statistics from Manfred application logs.")]
 internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
-
-    private string? _aggregationFileName;
-
-    public ManfredWebRequestCollector(string? aggregationFileName = null)
-    {
-        _aggregationFileName = aggregationFileName;
-    }
-
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
+
+    /// <summary>
+    /// Gets or sets the file path to write web request statistics to.
+    /// </summary>
+    [Configurable(ConfigurationType.Path)]
+    [Description("Gets or sets the file path to write web request statistics to.")]
+    public string? AggregationFileName { get; set; }
 
     private Dictionary<string, (int Count, DateTime FirstTime, DateTime LastTime)> _requestEntries = new();
     public Dictionary<string, int> StatusCodes = new();
@@ -127,10 +131,10 @@ internal class ManfredWebRequestCollector : IPipelineItem<LogEntry, LogEntry>, I
         var console = Pipeline.GetConsole();
         console.WriteLine(summary.ToString());
 
-        if (_aggregationFileName != null)
+        if (AggregationFileName != null)
         {
             Console.Write("Writing webrequest statistics file... ");
-            WriteToFile(_aggregationFileName);
+            WriteToFile(AggregationFileName);
             console.WriteLine("ok.");
         }
         console.WriteLine();
