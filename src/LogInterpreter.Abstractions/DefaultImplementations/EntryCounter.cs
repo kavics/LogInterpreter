@@ -1,14 +1,23 @@
+using System.ComponentModel;
 using System.Text;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
+/// <summary>
+/// Counts log entries by level and category and produces statistical summaries.
+/// </summary>
+[Description("Counts log entries by level and category and produces statistical summaries.")]
 public class EntryCounter : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
+    /// <summary>
+    /// Gets or sets the file path to write aggregation results to.
+    /// </summary>
     [Configurable(ConfigurationType.Path)]
+    [Description("Gets or sets the file path to write aggregation results to.")]
     public string? AggregationFileName { get; set; }
 
     public int Entries { get; private set; }

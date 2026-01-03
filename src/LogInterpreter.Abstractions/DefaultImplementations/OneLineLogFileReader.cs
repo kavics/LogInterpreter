@@ -1,5 +1,11 @@
-﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+﻿using System.ComponentModel;
 
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+
+/// <summary>
+/// Reads log files line by line (one log entry per line format).
+/// </summary>
+[Description("Reads log files line by line (one log entry per line format).")]
 public class OneLineLogFileReader : IPipelineItem<string, string>
 {
     public Pipeline Pipeline { get; set; } = null!;

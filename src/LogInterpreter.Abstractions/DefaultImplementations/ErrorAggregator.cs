@@ -1,14 +1,23 @@
+using System.ComponentModel;
 using System.Text;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
+/// <summary>
+/// Collects and aggregates error, warning, and critical log entries.
+/// </summary>
+[Description("Collects and aggregates error, warning, and critical log entries.")]
 public class ErrorAggregator : IPipelineItem<LogEntry, LogEntry>, IAggregation
 {
     public Pipeline Pipeline { get; set; } = null!;
     public string Name => this.GetType().Name;
     public IEnumerable<LogEntry> Input { get; set; } = Array.Empty<LogEntry>();
 
+    /// <summary>
+    /// Gets or sets the file path to write error aggregation results to.
+    /// </summary>
     [Configurable(ConfigurationType.Path)]
+    [Description("Gets or sets the file path to write error aggregation results to.")]
     public string? AggregationFileName { get; set; }
 
     public Dictionary<string, List<DateTime>> Criticals = new();

@@ -1,7 +1,14 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
 
+/// <summary>
+/// Reads log files where each entry consists of two lines: header and JSON properties.
+/// This class is obsolete. Use <see cref="TwoLineLogReader"/> instead.
+/// </summary>
+[Description("Reads log files where each entry consists of two lines: header and JSON properties. (Obsolete)")]
+[Obsolete("Use TwoLineLogReader instead.")]
 public class TwoLineLogFileReader : IPipelineItem<string, string[]>
 {
     public Pipeline Pipeline { get; set; } = null!;

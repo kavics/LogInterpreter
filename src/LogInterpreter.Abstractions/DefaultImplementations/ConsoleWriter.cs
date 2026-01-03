@@ -1,5 +1,11 @@
-﻿namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+﻿using System.ComponentModel;
 
+namespace Kavics.LogInterpreter.Abstractions.DefaultImplementations;
+
+/// <summary>
+/// Writes each log entry to the console output.
+/// </summary>
+[Description("Writes each log entry to the console output.")]
 public class ConsoleWriter : IPipelineItem<string, string>
 {
     public Pipeline Pipeline { get; set; } = null!;
