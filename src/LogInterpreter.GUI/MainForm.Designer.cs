@@ -59,9 +59,9 @@ namespace LogInterpreter.GUI
             pipelineFlowLayoutPanel = new FlowLayoutPanel();
             propertiesPanel = new Panel();
             propertiesContentPanel = new Panel();
-            propertyOutputTextBox = new TextBox();
+            propertyOutputValueLabel = new Label();
             propertyOutputLabel = new Label();
-            propertyInputTextBox = new TextBox();
+            propertyInputValueLabel = new Label();
             propertyInputLabel = new Label();
             propertyDescriptionTextBox = new TextBox();
             propertyTypeLabel = new Label();
@@ -257,7 +257,7 @@ namespace LogInterpreter.GUI
             navigationLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             navigationLabel.Location = new Point(12, 18);
             navigationLabel.Name = "navigationLabel";
-            navigationLabel.Size = new Size(91, 21);
+            navigationLabel.Size = new Size(96, 21);
             navigationLabel.TabIndex = 0;
             navigationLabel.Text = "Navigation";
             // 
@@ -313,9 +313,9 @@ namespace LogInterpreter.GUI
             // propertiesContentPanel
             // 
             propertiesContentPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            propertiesContentPanel.Controls.Add(propertyOutputTextBox);
+            propertiesContentPanel.Controls.Add(propertyOutputValueLabel);
             propertiesContentPanel.Controls.Add(propertyOutputLabel);
-            propertiesContentPanel.Controls.Add(propertyInputTextBox);
+            propertiesContentPanel.Controls.Add(propertyInputValueLabel);
             propertiesContentPanel.Controls.Add(propertyInputLabel);
             propertiesContentPanel.Controls.Add(propertyDescriptionTextBox);
             propertiesContentPanel.Controls.Add(propertyTypeLabel);
@@ -325,51 +325,43 @@ namespace LogInterpreter.GUI
             propertiesContentPanel.TabIndex = 1;
             propertiesContentPanel.Visible = false;
             // 
+            // propertyOutputValueLabel
+            // 
+            propertyOutputValueLabel.AutoSize = true;
+            propertyOutputValueLabel.Font = new Font("Segoe UI", 8F);
+            propertyOutputValueLabel.ForeColor = Color.Gray;
+            propertyOutputValueLabel.Location = new Point(90, 140);
+            propertyOutputValueLabel.Name = "propertyOutputValueLabel";
+            propertyOutputValueLabel.Size = new Size(0, 13);
+            propertyOutputValueLabel.TabIndex = 7;
+            // 
             // propertyOutputLabel
             // 
             propertyOutputLabel.AutoSize = true;
             propertyOutputLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             propertyOutputLabel.Location = new Point(3, 140);
             propertyOutputLabel.Name = "propertyOutputLabel";
-            propertyOutputLabel.Size = new Size(80, 15);
+            propertyOutputLabel.Size = new Size(79, 15);
             propertyOutputLabel.TabIndex = 6;
             propertyOutputLabel.Text = "Output Type:";
             // 
-            // propertyOutputTextBox
+            // propertyInputValueLabel
             // 
-            propertyOutputTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            propertyOutputTextBox.BackColor = Color.Honeydew;
-            propertyOutputTextBox.BorderStyle = BorderStyle.FixedSingle;
-            propertyOutputTextBox.Font = new Font("Segoe UI", 8F);
-            propertyOutputTextBox.ForeColor = Color.Gray;
-            propertyOutputTextBox.Location = new Point(3, 160);
-            propertyOutputTextBox.Name = "propertyOutputTextBox";
-            propertyOutputTextBox.ReadOnly = true;
-            propertyOutputTextBox.Size = new Size(266, 22);
-            propertyOutputTextBox.TabIndex = 7;
-            propertyOutputTextBox.TabStop = false;
-            // 
-            // propertyInputTextBox
-            // 
-            propertyInputTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            propertyInputTextBox.BackColor = Color.Honeydew;
-            propertyInputTextBox.BorderStyle = BorderStyle.FixedSingle;
-            propertyInputTextBox.Font = new Font("Segoe UI", 8F);
-            propertyInputTextBox.ForeColor = Color.Gray;
-            propertyInputTextBox.Location = new Point(3, 115);
-            propertyInputTextBox.Name = "propertyInputTextBox";
-            propertyInputTextBox.ReadOnly = true;
-            propertyInputTextBox.Size = new Size(266, 22);
-            propertyInputTextBox.TabIndex = 5;
-            propertyInputTextBox.TabStop = false;
+            propertyInputValueLabel.AutoSize = true;
+            propertyInputValueLabel.Font = new Font("Segoe UI", 8F);
+            propertyInputValueLabel.ForeColor = Color.Gray;
+            propertyInputValueLabel.Location = new Point(90, 115);
+            propertyInputValueLabel.Name = "propertyInputValueLabel";
+            propertyInputValueLabel.Size = new Size(0, 13);
+            propertyInputValueLabel.TabIndex = 5;
             // 
             // propertyInputLabel
             // 
             propertyInputLabel.AutoSize = true;
             propertyInputLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            propertyInputLabel.Location = new Point(3, 95);
+            propertyInputLabel.Location = new Point(3, 115);
             propertyInputLabel.Name = "propertyInputLabel";
-            propertyInputLabel.Size = new Size(72, 15);
+            propertyInputLabel.Size = new Size(69, 15);
             propertyInputLabel.TabIndex = 4;
             propertyInputLabel.Text = "Input Type:";
             // 
@@ -465,8 +457,8 @@ namespace LogInterpreter.GUI
         private Label propertyTypeLabel;
         private TextBox propertyDescriptionTextBox;
         private Label propertyInputLabel;
-        private TextBox propertyInputTextBox;
+        private Label propertyInputValueLabel;
         private Label propertyOutputLabel;
-        private TextBox propertyOutputTextBox;
+        private Label propertyOutputValueLabel;
     }
 }
