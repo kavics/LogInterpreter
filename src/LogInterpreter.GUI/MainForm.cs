@@ -1,3 +1,4 @@
+using Kavics.LogInterpreter.Abstractions;
 using LogInterpreter.GUI.Controls;
 
 namespace LogInterpreter.GUI
@@ -32,6 +33,20 @@ namespace LogInterpreter.GUI
         {
             int cardWidth = pipelineFlowLayoutPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 8;
 
+            // Parse the pipeline definition
+            var pipelineDefinition = @"LogSource
+    LogPath=/var/log/app.log
+    FirstFileName=/var/log/app-2025-12-01.txt
+ConsoleWriter
+OneLineLogFileReader
+CompactJsonLogParser
+ErrorAggregator
+    AggregationFileName=/var/log/aggregation.txt
+EntryCounter
+    AggregationFileName=/var/log/summary.txt";
+
+            var pipeline = Pipeline.Parse(pipelineDefinition);
+
             // Add Pipeline card (always first)
             var pipelineCard = new PipelineItemCard
             {
@@ -45,13 +60,31 @@ namespace LogInterpreter.GUI
             pipelineCard.Selected += PipelineCard_Selected;
             pipelineFlowLayoutPanel.Controls.Add(pipelineCard);
 
-            // Add example pipeline items
-            AddPipelineCard("LogSource", "Reads log files from a specified directory or a single file and emits their full paths.", "int", "string", cardWidth);
-            AddPipelineCard("OneLineLogFileReader", "Reads log files line by line (one log entry per line format).", "string", "string", cardWidth);
-            AddPipelineCard("CompactJsonLogParser", "Parses log entries from compact JSON format (one JSON object per line).", "string", "LogEntry", cardWidth);
-            AddPipelineCard("Filter<LogEntry>", "Filters entries based on a custom predicate function.", "LogEntry", "LogEntry", cardWidth);
-            AddPipelineCard("Formatter<LogEntry>", "Formats log entries into string representation using a custom function.", "LogEntry", "string", cardWidth);
-            AddPipelineCard("ConsoleWriter", "Writes each log entry to the console output.", "string", "string", cardWidth);
+            // Add cards from the parsed pipeline
+            foreach (var item in pipeline.Items)
+            {
+                var itemType = item.GetType();
+                var descriptor = Pipeline.AvailableItems.FirstOrDefault(d => d.Type == itemType);
+
+                if (descriptor != null)
+                {
+                    // Get input and output types from the pipeline item
+                    var pipelineItemInterface = itemType.GetInterfaces()
+                        .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IPipelineItem<,>));
+
+                    string inputType = "-";
+                    string outputType = "-";
+
+                    if (pipelineItemInterface != null)
+                    {
+                        var genericArgs = pipelineItemInterface.GetGenericArguments();
+                        inputType = genericArgs[0].Name;
+                        outputType = genericArgs[1].Name;
+                    }
+
+                    AddPipelineCard(descriptor.Name, descriptor.Description, inputType, outputType, cardWidth);
+                }
+            }
         }
 
         private void AddPipelineCard(string itemType, string description, string inputType, string outputType, int cardWidth)
