@@ -82,7 +82,7 @@ namespace LogInterpreter.GUI
             menuStrip.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem, helpToolStripMenuItem });
             menuStrip.Location = new Point(0, 0);
             menuStrip.Name = "menuStrip";
-            menuStrip.Size = new Size(800, 24);
+            menuStrip.Size = new Size(826, 24);
             menuStrip.TabIndex = 0;
             menuStrip.Text = "menuStrip1";
             // 
@@ -231,7 +231,7 @@ namespace LogInterpreter.GUI
             statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
             statusStrip.Location = new Point(0, 428);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new Size(800, 22);
+            statusStrip.Size = new Size(826, 22);
             statusStrip.TabIndex = 1;
             statusStrip.Text = "statusStrip1";
             // 
@@ -248,7 +248,7 @@ namespace LogInterpreter.GUI
             navigationPanel.Dock = DockStyle.Top;
             navigationPanel.Location = new Point(0, 24);
             navigationPanel.Name = "navigationPanel";
-            navigationPanel.Size = new Size(800, 60);
+            navigationPanel.Size = new Size(826, 60);
             navigationPanel.TabIndex = 2;
             // 
             // navigationLabel
@@ -274,8 +274,8 @@ namespace LogInterpreter.GUI
             // splitContainer.Panel2
             // 
             splitContainer.Panel2.Controls.Add(propertiesPanel);
-            splitContainer.Size = new Size(800, 344);
-            splitContainer.SplitterDistance = 500;
+            splitContainer.Size = new Size(826, 344);
+            splitContainer.SplitterDistance = 485;
             splitContainer.TabIndex = 3;
             // 
             // pipelinePanel
@@ -285,7 +285,7 @@ namespace LogInterpreter.GUI
             pipelinePanel.Dock = DockStyle.Fill;
             pipelinePanel.Location = new Point(0, 0);
             pipelinePanel.Name = "pipelinePanel";
-            pipelinePanel.Size = new Size(500, 344);
+            pipelinePanel.Size = new Size(485, 344);
             pipelinePanel.TabIndex = 0;
             // 
             // pipelineFlowLayoutPanel
@@ -296,7 +296,7 @@ namespace LogInterpreter.GUI
             pipelineFlowLayoutPanel.Location = new Point(0, 0);
             pipelineFlowLayoutPanel.Name = "pipelineFlowLayoutPanel";
             pipelineFlowLayoutPanel.Padding = new Padding(4);
-            pipelineFlowLayoutPanel.Size = new Size(500, 344);
+            pipelineFlowLayoutPanel.Size = new Size(485, 344);
             pipelineFlowLayoutPanel.TabIndex = 1;
             pipelineFlowLayoutPanel.WrapContents = false;
             // 
@@ -306,22 +306,24 @@ namespace LogInterpreter.GUI
             propertiesPanel.Controls.Add(propertiesContentPanel);
             propertiesPanel.Dock = DockStyle.Fill;
             propertiesPanel.Location = new Point(0, 0);
+            propertiesPanel.Margin = new Padding(0);
             propertiesPanel.Name = "propertiesPanel";
-            propertiesPanel.Size = new Size(296, 344);
+            propertiesPanel.Size = new Size(337, 344);
             propertiesPanel.TabIndex = 0;
             // 
             // propertiesContentPanel
             // 
-            propertiesContentPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             propertiesContentPanel.Controls.Add(propertyOutputValueLabel);
             propertiesContentPanel.Controls.Add(propertyOutputLabel);
             propertiesContentPanel.Controls.Add(propertyInputValueLabel);
             propertiesContentPanel.Controls.Add(propertyInputLabel);
             propertiesContentPanel.Controls.Add(propertyDescriptionTextBox);
             propertiesContentPanel.Controls.Add(propertyTypeLabel);
-            propertiesContentPanel.Location = new Point(12, 12);
+            propertiesContentPanel.Dock = DockStyle.Fill;
+            propertiesContentPanel.Location = new Point(0, 0);
+            propertiesContentPanel.Margin = new Padding(0);
             propertiesContentPanel.Name = "propertiesContentPanel";
-            propertiesContentPanel.Size = new Size(272, 320);
+            propertiesContentPanel.Size = new Size(337, 344);
             propertiesContentPanel.TabIndex = 1;
             propertiesContentPanel.Visible = false;
             // 
@@ -329,19 +331,20 @@ namespace LogInterpreter.GUI
             // 
             propertyOutputValueLabel.AutoSize = true;
             propertyOutputValueLabel.Font = new Font("Segoe UI", 8F);
-            propertyOutputValueLabel.ForeColor = Color.Gray;
-            propertyOutputValueLabel.Location = new Point(90, 140);
+            propertyOutputValueLabel.ForeColor = Color.Black;
+            propertyOutputValueLabel.Location = new Point(90, 108);
             propertyOutputValueLabel.Name = "propertyOutputValueLabel";
-            propertyOutputValueLabel.Size = new Size(0, 13);
+            propertyOutputValueLabel.Size = new Size(115, 13);
             propertyOutputValueLabel.TabIndex = 7;
+            propertyOutputValueLabel.Text = "<output type name>";
             // 
             // propertyOutputLabel
             // 
             propertyOutputLabel.AutoSize = true;
-            propertyOutputLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            propertyOutputLabel.Location = new Point(3, 140);
+            propertyOutputLabel.Font = new Font("Segoe UI", 9F);
+            propertyOutputLabel.Location = new Point(3, 108);
             propertyOutputLabel.Name = "propertyOutputLabel";
-            propertyOutputLabel.Size = new Size(79, 15);
+            propertyOutputLabel.Size = new Size(76, 15);
             propertyOutputLabel.TabIndex = 6;
             propertyOutputLabel.Text = "Output Type:";
             // 
@@ -349,19 +352,20 @@ namespace LogInterpreter.GUI
             // 
             propertyInputValueLabel.AutoSize = true;
             propertyInputValueLabel.Font = new Font("Segoe UI", 8F);
-            propertyInputValueLabel.ForeColor = Color.Gray;
-            propertyInputValueLabel.Location = new Point(90, 115);
+            propertyInputValueLabel.ForeColor = Color.Black;
+            propertyInputValueLabel.Location = new Point(90, 90);
             propertyInputValueLabel.Name = "propertyInputValueLabel";
-            propertyInputValueLabel.Size = new Size(0, 13);
+            propertyInputValueLabel.Size = new Size(107, 13);
             propertyInputValueLabel.TabIndex = 5;
+            propertyInputValueLabel.Text = "<input type name>";
             // 
             // propertyInputLabel
             // 
             propertyInputLabel.AutoSize = true;
-            propertyInputLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            propertyInputLabel.Location = new Point(3, 115);
+            propertyInputLabel.Font = new Font("Segoe UI", 9F);
+            propertyInputLabel.Location = new Point(3, 88);
             propertyInputLabel.Name = "propertyInputLabel";
-            propertyInputLabel.Size = new Size(69, 15);
+            propertyInputLabel.Size = new Size(66, 15);
             propertyInputLabel.TabIndex = 4;
             propertyInputLabel.Text = "Input Type:";
             // 
@@ -377,9 +381,10 @@ namespace LogInterpreter.GUI
             propertyDescriptionTextBox.Name = "propertyDescriptionTextBox";
             propertyDescriptionTextBox.ReadOnly = true;
             propertyDescriptionTextBox.ScrollBars = ScrollBars.Vertical;
-            propertyDescriptionTextBox.Size = new Size(266, 60);
+            propertyDescriptionTextBox.Size = new Size(331, 60);
             propertyDescriptionTextBox.TabIndex = 1;
             propertyDescriptionTextBox.TabStop = false;
+            propertyDescriptionTextBox.Text = "Pipeline item description";
             // 
             // propertyTypeLabel
             // 
@@ -388,14 +393,15 @@ namespace LogInterpreter.GUI
             propertyTypeLabel.Location = new Point(3, 0);
             propertyTypeLabel.Name = "propertyTypeLabel";
             propertyTypeLabel.Padding = new Padding(0, 0, 0, 4);
-            propertyTypeLabel.Size = new Size(0, 24);
+            propertyTypeLabel.Size = new Size(119, 24);
             propertyTypeLabel.TabIndex = 0;
+            propertyTypeLabel.Text = "<PipelineItem>";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(826, 450);
             Controls.Add(splitContainer);
             Controls.Add(navigationPanel);
             Controls.Add(statusStrip);

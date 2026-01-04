@@ -158,7 +158,7 @@ EntryCounter
             }
         }
 
-        private int _dynamicControlsStartY = 190;
+        private int _dynamicControlsStartY = 138;
         private readonly List<Control> _dynamicControls = new();
 
         private void ClearDynamicPropertyControls()
