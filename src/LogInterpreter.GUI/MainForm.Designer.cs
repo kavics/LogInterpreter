@@ -57,8 +57,8 @@ namespace LogInterpreter.GUI
             splitContainer = new SplitContainer();
             pipelinePanel = new Panel();
             pipelineFlowLayoutPanel = new FlowLayoutPanel();
-            samplePipelineCard = new Controls.PipelineItemCard();
-            sampleItemCard = new Controls.PipelineItemCard();
+            samplePipelineCard = new LogInterpreter.GUI.Controls.PipelineItemCard();
+            sampleItemCard = new LogInterpreter.GUI.Controls.PipelineItemCard();
             propertiesPanel = new Panel();
             propertiesContentPanel = new Panel();
             propertyOutputValueLabel = new Label();
@@ -75,6 +75,7 @@ namespace LogInterpreter.GUI
             splitContainer.Panel2.SuspendLayout();
             splitContainer.SuspendLayout();
             pipelinePanel.SuspendLayout();
+            pipelineFlowLayoutPanel.SuspendLayout();
             propertiesPanel.SuspendLayout();
             propertiesContentPanel.SuspendLayout();
             SuspendLayout();
@@ -311,12 +312,13 @@ namespace LogInterpreter.GUI
             samplePipelineCard.Cursor = Cursors.Hand;
             samplePipelineCard.Description = "The main pipeline container";
             samplePipelineCard.InputType = "Input: -";
-            samplePipelineCard.IsFirstItem = true;
+            samplePipelineCard.IsSelected = false;
             samplePipelineCard.ItemType = "Pipeline";
             samplePipelineCard.Location = new Point(4, 4);
             samplePipelineCard.Margin = new Padding(0, 0, 0, 4);
             samplePipelineCard.Name = "samplePipelineCard";
             samplePipelineCard.OutputType = "Output: -";
+            samplePipelineCard.Padding = new Padding(0, 0, 0, 4);
             samplePipelineCard.Size = new Size(455, 60);
             samplePipelineCard.TabIndex = 0;
             // 
@@ -327,11 +329,13 @@ namespace LogInterpreter.GUI
             sampleItemCard.Cursor = Cursors.Hand;
             sampleItemCard.Description = "Reads log entries from a source";
             sampleItemCard.InputType = "Input: LogSource";
+            sampleItemCard.IsSelected = false;
             sampleItemCard.ItemType = "LogReader";
             sampleItemCard.Location = new Point(16, 68);
             sampleItemCard.Margin = new Padding(12, 0, 0, 4);
             sampleItemCard.Name = "sampleItemCard";
             sampleItemCard.OutputType = "Output: String";
+            sampleItemCard.Padding = new Padding(0, 0, 0, 4);
             sampleItemCard.Size = new Size(443, 85);
             sampleItemCard.TabIndex = 1;
             // 
@@ -442,6 +446,7 @@ namespace LogInterpreter.GUI
             Controls.Add(navigationPanel);
             Controls.Add(statusStrip);
             Controls.Add(menuStrip);
+            KeyPreview = true;
             MainMenuStrip = menuStrip;
             Name = "MainForm";
             Text = "Log Interpreter";

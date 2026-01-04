@@ -16,6 +16,46 @@ namespace LogInterpreter.GUI
             pipelineFlowLayoutPanel.Resize += PipelineFlowLayoutPanel_Resize;
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (_selectedCard == null)
+                return base.ProcessCmdKey(ref msg, keyData);
+
+            // Only handle Up and Down keys
+            if (keyData != Keys.Down && keyData != Keys.Up)
+                return base.ProcessCmdKey(ref msg, keyData);
+
+            int currentIndex = pipelineFlowLayoutPanel.Controls.IndexOf(_selectedCard);
+            PipelineItemCard? nextCard = null;
+
+            if (keyData == Keys.Down)
+            {
+                // Move to next card
+                if (currentIndex < pipelineFlowLayoutPanel.Controls.Count - 1)
+                {
+                    nextCard = pipelineFlowLayoutPanel.Controls[currentIndex + 1] as PipelineItemCard;
+                }
+            }
+            else if (keyData == Keys.Up)
+            {
+                // Move to previous card
+                if (currentIndex > 0)
+                {
+                    nextCard = pipelineFlowLayoutPanel.Controls[currentIndex - 1] as PipelineItemCard;
+                }
+            }
+
+            if (nextCard != null)
+            {
+                nextCard.IsSelected = true;
+                // Scroll the card into view
+                pipelineFlowLayoutPanel.ScrollControlIntoView(nextCard);
+            }
+
+            // Always return true for Up/Down keys to prevent default scrolling behavior
+            return true;
+        }
+
         private void PipelineFlowLayoutPanel_Resize(object? sender, EventArgs e)
         {
             // Adjust all card widths when panel resizes
