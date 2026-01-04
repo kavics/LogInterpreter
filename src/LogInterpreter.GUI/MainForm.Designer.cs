@@ -57,6 +57,8 @@ namespace LogInterpreter.GUI
             splitContainer = new SplitContainer();
             pipelinePanel = new Panel();
             pipelineFlowLayoutPanel = new FlowLayoutPanel();
+            samplePipelineCard = new Controls.PipelineItemCard();
+            sampleItemCard = new Controls.PipelineItemCard();
             propertiesPanel = new Panel();
             propertiesContentPanel = new Panel();
             propertyOutputValueLabel = new Label();
@@ -291,6 +293,8 @@ namespace LogInterpreter.GUI
             // pipelineFlowLayoutPanel
             // 
             pipelineFlowLayoutPanel.AutoScroll = true;
+            pipelineFlowLayoutPanel.Controls.Add(samplePipelineCard);
+            pipelineFlowLayoutPanel.Controls.Add(sampleItemCard);
             pipelineFlowLayoutPanel.Dock = DockStyle.Fill;
             pipelineFlowLayoutPanel.FlowDirection = FlowDirection.TopDown;
             pipelineFlowLayoutPanel.Location = new Point(0, 0);
@@ -299,6 +303,37 @@ namespace LogInterpreter.GUI
             pipelineFlowLayoutPanel.Size = new Size(485, 344);
             pipelineFlowLayoutPanel.TabIndex = 1;
             pipelineFlowLayoutPanel.WrapContents = false;
+            // 
+            // samplePipelineCard
+            // 
+            samplePipelineCard.BackColor = Color.White;
+            samplePipelineCard.BorderStyle = BorderStyle.FixedSingle;
+            samplePipelineCard.Cursor = Cursors.Hand;
+            samplePipelineCard.Description = "The main pipeline container";
+            samplePipelineCard.InputType = "Input: -";
+            samplePipelineCard.IsFirstItem = true;
+            samplePipelineCard.ItemType = "Pipeline";
+            samplePipelineCard.Location = new Point(4, 4);
+            samplePipelineCard.Margin = new Padding(0, 0, 0, 4);
+            samplePipelineCard.Name = "samplePipelineCard";
+            samplePipelineCard.OutputType = "Output: -";
+            samplePipelineCard.Size = new Size(455, 60);
+            samplePipelineCard.TabIndex = 0;
+            // 
+            // sampleItemCard
+            // 
+            sampleItemCard.BackColor = Color.White;
+            sampleItemCard.BorderStyle = BorderStyle.FixedSingle;
+            sampleItemCard.Cursor = Cursors.Hand;
+            sampleItemCard.Description = "Reads log entries from a source";
+            sampleItemCard.InputType = "Input: LogSource";
+            sampleItemCard.ItemType = "LogReader";
+            sampleItemCard.Location = new Point(16, 68);
+            sampleItemCard.Margin = new Padding(12, 0, 0, 4);
+            sampleItemCard.Name = "sampleItemCard";
+            sampleItemCard.OutputType = "Output: String";
+            sampleItemCard.Size = new Size(443, 85);
+            sampleItemCard.TabIndex = 1;
             // 
             // propertiesPanel
             // 
@@ -313,6 +348,7 @@ namespace LogInterpreter.GUI
             // 
             // propertiesContentPanel
             // 
+            propertiesContentPanel.AutoScroll = true;
             propertiesContentPanel.Controls.Add(propertyOutputValueLabel);
             propertiesContentPanel.Controls.Add(propertyOutputLabel);
             propertiesContentPanel.Controls.Add(propertyInputValueLabel);
@@ -420,6 +456,7 @@ namespace LogInterpreter.GUI
             ((System.ComponentModel.ISupportInitialize)splitContainer).EndInit();
             splitContainer.ResumeLayout(false);
             pipelinePanel.ResumeLayout(false);
+            pipelineFlowLayoutPanel.ResumeLayout(false);
             propertiesPanel.ResumeLayout(false);
             propertiesContentPanel.ResumeLayout(false);
             propertiesContentPanel.PerformLayout();
@@ -466,5 +503,7 @@ namespace LogInterpreter.GUI
         private Label propertyInputValueLabel;
         private Label propertyOutputLabel;
         private Label propertyOutputValueLabel;
+        private Controls.PipelineItemCard samplePipelineCard;
+        private Controls.PipelineItemCard sampleItemCard;
     }
 }

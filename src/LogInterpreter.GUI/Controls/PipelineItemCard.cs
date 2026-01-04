@@ -7,8 +7,7 @@ namespace LogInterpreter.GUI.Controls
     {
         private bool _isSelected;
         private Color _normalBackColor = Color.White;
-        private Color _selectedBackColor = Color.FromArgb(230, 240, 255);
-        private Color _firstItemBackColor = Color.LightBlue;
+        private Color _selectedBackColor = Color.LightBlue;
 
         public event EventHandler? Selected;
 
@@ -82,8 +81,13 @@ namespace LogInterpreter.GUI.Controls
             {
                 if (value)
                 {
-                    _normalBackColor = _firstItemBackColor;
+                    // Pipeline card has same background as other cards
+                    _normalBackColor = Color.White;
                     UpdateBackColor();
+                    // Hide the input/output panel for the Pipeline card
+                    ioPanel.Visible = false;
+                    // Reduce the height of the card when IO panel is hidden
+                    this.Height = typePanel.Height + this.Padding.Vertical;
                 }
             }
         }

@@ -19,18 +19,31 @@ namespace LogInterpreter.GUI
         private void PipelineFlowLayoutPanel_Resize(object? sender, EventArgs e)
         {
             // Adjust all card widths when panel resizes
-            int cardWidth = pipelineFlowLayoutPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 8;
+            int baseCardWidth = pipelineFlowLayoutPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 8;
             foreach (Control control in pipelineFlowLayoutPanel.Controls)
             {
                 if (control is PipelineItemCard card)
                 {
-                    card.Width = cardWidth;
+                    // Pipeline card (first item) gets full width, others are indented by 12px
+                    if (card.Margin.Left == 0)
+                    {
+                        // Pipeline card - no indent
+                        card.Width = baseCardWidth;
+                    }
+                    else
+                    {
+                        // Pipeline item cards - reduce width by 12px to account for left margin
+                        card.Width = baseCardWidth - 12;
+                    }
                 }
             }
         }
 
         private void InitializePipelineCards()
         {
+            // Clear designer sample cards
+            pipelineFlowLayoutPanel.Controls.Clear();
+            
             int cardWidth = pipelineFlowLayoutPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 8;
 
             // Parse the pipeline definition
@@ -56,6 +69,7 @@ EntryCounter
                 OutputType = "Output: -",
                 IsFirstItem = true,
                 Width = cardWidth,
+                Margin = new Padding(0, 0, 0, 4), // No left margin for Pipeline card
                 Tag = null // Pipeline card has no PipelineItem
             };
             pipelineCard.Selected += PipelineCard_Selected;
@@ -86,6 +100,9 @@ EntryCounter
                     AddPipelineCard(descriptor.Name, descriptor.Description, inputType, outputType, cardWidth, item, descriptor);
                 }
             }
+
+            // Select the Pipeline card by default
+            pipelineCard.IsSelected = true;
         }
 
         private void AddPipelineCard(string itemType, string description, string inputType, string outputType, 
@@ -97,7 +114,8 @@ EntryCounter
                 Description = description,
                 InputType = $"Input: {inputType}",
                 OutputType = $"Output: {outputType}",
-                Width = cardWidth,
+                Width = cardWidth - 12, // Reduce width to account for left margin
+                Margin = new Padding(12, 0, 0, 4), // 12px left margin for pipeline items
                 Tag = new { Item = pipelineItem, Descriptor = descriptor }
             };
             card.Selected += PipelineCard_Selected;
