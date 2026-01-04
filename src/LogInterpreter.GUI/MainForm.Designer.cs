@@ -61,10 +61,8 @@ namespace LogInterpreter.GUI
             sampleItemCard = new LogInterpreter.GUI.Controls.PipelineItemCard();
             propertiesPanel = new Panel();
             propertiesContentPanel = new Panel();
-            propertyOutputValueLabel = new Label();
-            propertyOutputLabel = new Label();
-            propertyInputValueLabel = new Label();
-            propertyInputLabel = new Label();
+            propertyInputOutputValueLabel = new Label();
+            propertyInputOutputLabel = new Label();
             propertyDescriptionTextBox = new TextBox();
             propertyTypeLabel = new Label();
             menuStrip.SuspendLayout();
@@ -311,13 +309,14 @@ namespace LogInterpreter.GUI
             samplePipelineCard.BorderStyle = BorderStyle.FixedSingle;
             samplePipelineCard.Cursor = Cursors.Hand;
             samplePipelineCard.Description = "The main pipeline container";
-            samplePipelineCard.InputType = "Input: -";
+            samplePipelineCard.InputType = "-";
+            samplePipelineCard.IsFirstItem = true;
             samplePipelineCard.IsSelected = false;
             samplePipelineCard.ItemType = "Pipeline";
             samplePipelineCard.Location = new Point(4, 4);
             samplePipelineCard.Margin = new Padding(0, 0, 0, 4);
             samplePipelineCard.Name = "samplePipelineCard";
-            samplePipelineCard.OutputType = "Output: -";
+            samplePipelineCard.OutputType = "-";
             samplePipelineCard.Padding = new Padding(0, 0, 0, 4);
             samplePipelineCard.Size = new Size(455, 60);
             samplePipelineCard.TabIndex = 0;
@@ -328,15 +327,16 @@ namespace LogInterpreter.GUI
             sampleItemCard.BorderStyle = BorderStyle.FixedSingle;
             sampleItemCard.Cursor = Cursors.Hand;
             sampleItemCard.Description = "Reads log entries from a source";
-            sampleItemCard.InputType = "Input: LogSource";
+            sampleItemCard.InputType = "LogSource";
             sampleItemCard.IsSelected = false;
             sampleItemCard.ItemType = "LogReader";
             sampleItemCard.Location = new Point(16, 68);
             sampleItemCard.Margin = new Padding(12, 0, 0, 4);
             sampleItemCard.Name = "sampleItemCard";
-            sampleItemCard.OutputType = "Output: String";
+            sampleItemCard.OutputType = "String";
             sampleItemCard.Padding = new Padding(0, 0, 0, 4);
-            sampleItemCard.Size = new Size(443, 85);
+            sampleItemCard.ShowDescription = false;
+            sampleItemCard.Size = new Size(443, 50);
             sampleItemCard.TabIndex = 1;
             // 
             // propertiesPanel
@@ -353,10 +353,8 @@ namespace LogInterpreter.GUI
             // propertiesContentPanel
             // 
             propertiesContentPanel.AutoScroll = true;
-            propertiesContentPanel.Controls.Add(propertyOutputValueLabel);
-            propertiesContentPanel.Controls.Add(propertyOutputLabel);
-            propertiesContentPanel.Controls.Add(propertyInputValueLabel);
-            propertiesContentPanel.Controls.Add(propertyInputLabel);
+            propertiesContentPanel.Controls.Add(propertyInputOutputValueLabel);
+            propertiesContentPanel.Controls.Add(propertyInputOutputLabel);
             propertiesContentPanel.Controls.Add(propertyDescriptionTextBox);
             propertiesContentPanel.Controls.Add(propertyTypeLabel);
             propertiesContentPanel.Dock = DockStyle.Fill;
@@ -367,47 +365,26 @@ namespace LogInterpreter.GUI
             propertiesContentPanel.TabIndex = 1;
             propertiesContentPanel.Visible = false;
             // 
-            // propertyOutputValueLabel
+            // propertyInputOutputLabel
             // 
-            propertyOutputValueLabel.AutoSize = true;
-            propertyOutputValueLabel.Font = new Font("Segoe UI", 8F);
-            propertyOutputValueLabel.ForeColor = Color.Black;
-            propertyOutputValueLabel.Location = new Point(90, 108);
-            propertyOutputValueLabel.Name = "propertyOutputValueLabel";
-            propertyOutputValueLabel.Size = new Size(115, 13);
-            propertyOutputValueLabel.TabIndex = 7;
-            propertyOutputValueLabel.Text = "<output type name>";
+            propertyInputOutputLabel.AutoSize = true;
+            propertyInputOutputLabel.Font = new Font("Segoe UI", 9F);
+            propertyInputOutputLabel.Location = new Point(3, 88);
+            propertyInputOutputLabel.Name = "propertyInputOutputLabel";
+            propertyInputOutputLabel.Size = new Size(85, 15);
+            propertyInputOutputLabel.TabIndex = 4;
+            propertyInputOutputLabel.Text = "Input/Output:";
             // 
-            // propertyOutputLabel
+            // propertyInputOutputValueLabel
             // 
-            propertyOutputLabel.AutoSize = true;
-            propertyOutputLabel.Font = new Font("Segoe UI", 9F);
-            propertyOutputLabel.Location = new Point(3, 108);
-            propertyOutputLabel.Name = "propertyOutputLabel";
-            propertyOutputLabel.Size = new Size(76, 15);
-            propertyOutputLabel.TabIndex = 6;
-            propertyOutputLabel.Text = "Output Type:";
-            // 
-            // propertyInputValueLabel
-            // 
-            propertyInputValueLabel.AutoSize = true;
-            propertyInputValueLabel.Font = new Font("Segoe UI", 8F);
-            propertyInputValueLabel.ForeColor = Color.Black;
-            propertyInputValueLabel.Location = new Point(90, 90);
-            propertyInputValueLabel.Name = "propertyInputValueLabel";
-            propertyInputValueLabel.Size = new Size(107, 13);
-            propertyInputValueLabel.TabIndex = 5;
-            propertyInputValueLabel.Text = "<input type name>";
-            // 
-            // propertyInputLabel
-            // 
-            propertyInputLabel.AutoSize = true;
-            propertyInputLabel.Font = new Font("Segoe UI", 9F);
-            propertyInputLabel.Location = new Point(3, 88);
-            propertyInputLabel.Name = "propertyInputLabel";
-            propertyInputLabel.Size = new Size(66, 15);
-            propertyInputLabel.TabIndex = 4;
-            propertyInputLabel.Text = "Input Type:";
+            propertyInputOutputValueLabel.AutoSize = true;
+            propertyInputOutputValueLabel.Font = new Font("Segoe UI", 8F);
+            propertyInputOutputValueLabel.ForeColor = Color.Black;
+            propertyInputOutputValueLabel.Location = new Point(94, 90);
+            propertyInputOutputValueLabel.Name = "propertyInputOutputValueLabel";
+            propertyInputOutputValueLabel.Size = new Size(150, 13);
+            propertyInputOutputValueLabel.TabIndex = 5;
+            propertyInputOutputValueLabel.Text = "<input> --> <output>";
             // 
             // propertyDescriptionTextBox
             // 
@@ -504,10 +481,8 @@ namespace LogInterpreter.GUI
         private Panel propertiesContentPanel;
         private Label propertyTypeLabel;
         private TextBox propertyDescriptionTextBox;
-        private Label propertyInputLabel;
-        private Label propertyInputValueLabel;
-        private Label propertyOutputLabel;
-        private Label propertyOutputValueLabel;
+        private Label propertyInputOutputLabel;
+        private Label propertyInputOutputValueLabel;
         private Controls.PipelineItemCard samplePipelineCard;
         private Controls.PipelineItemCard sampleItemCard;
     }

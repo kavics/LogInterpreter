@@ -105,8 +105,8 @@ EntryCounter
             {
                 ItemType = "Pipeline",
                 Description = "The main pipeline container",
-                InputType = "Input: -",
-                OutputType = "Output: -",
+                InputType = "-",
+                OutputType = "-",
                 IsFirstItem = true,
                 Width = cardWidth,
                 Margin = new Padding(0, 0, 0, 4), // No left margin for Pipeline card
@@ -152,10 +152,11 @@ EntryCounter
             {
                 ItemType = itemType,
                 Description = description,
-                InputType = $"Input: {inputType}",
-                OutputType = $"Output: {outputType}",
+                InputType = inputType,
+                OutputType = outputType,
                 Width = cardWidth - 12, // Reduce width to account for left margin
                 Margin = new Padding(12, 0, 0, 4), // 12px left margin for pipeline items
+                ShowDescription = false, // Hide description for pipeline items
                 Tag = new { Item = pipelineItem, Descriptor = descriptor }
             };
             card.Selected += PipelineCard_Selected;
@@ -189,11 +190,10 @@ EntryCounter
                 propertyDescriptionTextBox.Text = _selectedCard.Description;
                 
                 // Extract just the type from "Input: type" and "Output: type"
-                string inputType = _selectedCard.InputType.Replace("Input: ", "");
-                string outputType = _selectedCard.OutputType.Replace("Output: ", "");
+                string inputType = _selectedCard.InputType.Replace("Input: ", "").Replace(" -->", "").Trim();
+                string outputType = _selectedCard.OutputType.Replace("Output: ", "").Replace("-->", "").Trim();
                 
-                propertyInputValueLabel.Text = inputType;
-                propertyOutputValueLabel.Text = outputType;
+                propertyInputOutputValueLabel.Text = $"{inputType} --> {outputType}";
 
                 // Clear existing dynamic property controls
                 ClearDynamicPropertyControls();
@@ -216,7 +216,7 @@ EntryCounter
             }
         }
 
-        private int _dynamicControlsStartY = 138;
+        private int _dynamicControlsStartY = 110;
         private readonly List<Control> _dynamicControls = new();
 
         private void ClearDynamicPropertyControls()

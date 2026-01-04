@@ -66,13 +66,23 @@ namespace LogInterpreter.GUI.Controls
         public string InputType
         {
             get => inputTypeLabel.Text;
-            set => inputTypeLabel.Text = value;
+            set
+            {
+                // Remove "Input: " prefix if present
+                var cleanValue = value.Replace("Input: ", "").Trim();
+                inputTypeLabel.Text = $"{cleanValue} -->";
+            }
         }
 
         public string OutputType
         {
             get => outputTypeLabel.Text;
-            set => outputTypeLabel.Text = value;
+            set
+            {
+                // Remove "Output: " prefix if present
+                var cleanValue = value.Replace("Output: ", "").Trim();
+                outputTypeLabel.Text = $"--> {cleanValue}";
+            }
         }
 
         public bool IsFirstItem
@@ -88,6 +98,29 @@ namespace LogInterpreter.GUI.Controls
                     ioPanel.Visible = false;
                     // Reduce the height of the card when IO panel is hidden
                     this.Height = typePanel.Height + this.Padding.Vertical;
+                }
+            }
+        }
+
+        public bool ShowDescription
+        {
+            set
+            {
+                descriptionLabel.Visible = value;
+                if (!value)
+                {
+                    // Hide the description and adjust layout
+                    typePanel.Padding = new Padding(8, 8, 8, 8);
+                    typePanel.Height = itemTypeLabel.Height + typePanel.Padding.Vertical;
+                    // Recalculate card height: typePanel + ioPanel + card padding
+                    this.Height = typePanel.Height + ioPanel.Height + this.Padding.Vertical;
+                }
+                else
+                {
+                    // Show the description with normal layout
+                    typePanel.Padding = new Padding(8, 8, 8, 0);
+                    typePanel.Height = 55; // Default height with description
+                    this.Height = 80; // Default total height
                 }
             }
         }

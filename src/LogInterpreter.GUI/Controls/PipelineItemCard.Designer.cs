@@ -72,9 +72,9 @@ namespace LogInterpreter.GUI.Controls
             inputTypeLabel.Location = new Point(8, 2);
             inputTypeLabel.Name = "inputTypeLabel";
             inputTypeLabel.Padding = new Padding(0, 2, 0, 0);
-            inputTypeLabel.Size = new Size(64, 15);
+            inputTypeLabel.Size = new Size(65, 15);
             inputTypeLabel.TabIndex = 2;
-            inputTypeLabel.Text = "Input: string";
+            inputTypeLabel.Text = "string -->";
             // 
             // outputTypeLabel
             // 
@@ -82,12 +82,12 @@ namespace LogInterpreter.GUI.Controls
             outputTypeLabel.Dock = DockStyle.Right;
             outputTypeLabel.Font = new Font("Segoe UI", 8F);
             outputTypeLabel.ForeColor = Color.Gray;
-            outputTypeLabel.Location = new Point(212, 2);
+            outputTypeLabel.Location = new Point(203, 2);
             outputTypeLabel.Name = "outputTypeLabel";
             outputTypeLabel.Padding = new Padding(0, 2, 8, 0);
-            outputTypeLabel.Size = new Size(76, 15);
+            outputTypeLabel.Size = new Size(85, 15);
             outputTypeLabel.TabIndex = 3;
-            outputTypeLabel.Text = "Output: LogEntry";
+            outputTypeLabel.Text = "--> LogEntry";
             // 
             // typePanel
             // 
